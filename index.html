@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>GALAXY GOVERNANCE - Digital Transformation Boardroom</title>
-<!-- MQTT over WebSockets for firewall-free classroom networking -->
+<!-- MQTT over WebSockets for zero-configuration, firewall-proof classroom networking -->
 <script src="https://unpkg.com/mqtt@5.3.5/dist/mqtt.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
@@ -78,7 +78,6 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
 .badge-innovation { background: rgba(168, 85, 247, 0.2); color: var(--res-innovation); border: 1px solid var(--res-innovation); }
 .badge-compliance { background: rgba(16, 185, 129, 0.2); color: var(--res-compliance); border: 1px solid var(--res-compliance); }
 
-/* Host Popout Toast Container */
 #toast-container {
   position: fixed;
   top: 75px;
@@ -88,7 +87,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
   flex-direction: column;
   gap: 10px;
   pointer-events: none;
-  max-width: 420px;
+  max-width: 440px;
   width: 90%;
 }
 .toast-msg {
@@ -167,7 +166,6 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
 .phase-action { color: var(--accent-cyan); border-color: var(--accent-cyan); box-shadow: 0 0 10px rgba(6, 182, 212, 0.4); }
 .phase-crisis { color: var(--accent-red); border-color: var(--accent-red); box-shadow: 0 0 12px rgba(239, 68, 68, 0.5); }
 
-/* Spotlight Turn Banner */
 .turn-spotlight-bar {
   background: linear-gradient(90deg, #1e293b, #0f172a);
   border: 2px solid var(--accent-cyan);
@@ -196,7 +194,6 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
   .game-container { grid-template-columns: 1fr; }
 }
 
-/* Slots for Non-Sequential Fill */
 .slots-container {
   display: flex;
   flex-wrap: wrap;
@@ -293,7 +290,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
 }
 
 .crisis-resolution-box {
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(0, 0, 0, 0.5);
   border: 1px dashed #fca5a5;
   border-radius: 8px;
   padding: 15px;
@@ -387,15 +384,14 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
     <!-- FACILITATOR HOST & RESUME FORM -->
     <div id="lobby-host-section" style="display: none;">
       <p style="color: #cbd5e1; font-size: 0.9rem; margin-bottom: 15px;">
-        Host the classroom master session, pace team turns, and review governance actions.
+        Host classroom simulation, cycle phases, and review governance actions.
       </p>
       <button class="btn-gold" style="width: 100%; padding: 14px;" onclick="startHostGame()">LAUNCH NEW GAME ROOM</button>
       
-      <!-- Facilitator Rejoin / Resume Box -->
+      <!-- Resume Existing Room -->
       <div style="border-top: 1px solid #334155; margin-top: 20px; padding-top: 15px; text-align: left;">
-        <span style="font-size: 0.85rem; font-weight: bold; color: var(--accent-cyan);">RESUME DISCONNECTED SESSION:</span>
-        <p style="font-size: 0.78rem; color: #94a3b8; margin: 4px 0 8px;">Reopen your session if your browser closed or refreshed.</p>
-        <div style="display: flex; gap: 8px;">
+        <span style="font-size: 0.85rem; font-weight: bold; color: var(--accent-cyan);">RESUME PREVIOUS ROOM:</span>
+        <div style="display: flex; gap: 8px; margin-top: 6px;">
           <input type="text" id="resume-room-code" class="lobby-input" placeholder="ROOM CODE" maxlength="6" style="margin:0; text-transform: uppercase; flex: 1;" />
           <button class="btn-cyan" style="padding: 10px 14px; font-size: 0.85rem;" onclick="resumeHostGame()">RESUME</button>
         </div>
@@ -424,7 +420,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
       <span id="my-identity-tag" class="badge badge-innovation" style="margin-left: 6px;">Spectator</span>
     </div>
 
-    <!-- Simulator Switcher (Solo mode) -->
+    <!-- Simulator Switcher -->
     <div id="dev-team-switcher" style="display: none; align-items: center; gap: 6px;">
       <span style="font-size: 0.8rem; color: #94a3b8;">Simulate:</span>
       <button style="padding: 4px 8px; font-size: 0.75rem;" onclick="switchSimulatedTeam(1)">T1</button>
@@ -441,7 +437,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
 
   <div class="game-container">
     <div>
-      <!-- Turn Spotlight Banner (Synced for Facilitator & Classroom) -->
+      <!-- Turn Spotlight Banner -->
       <div id="turn-spotlight-bar" class="turn-spotlight-bar">
         <div>
           <span style="font-size: 0.8rem; color: #94a3b8; font-weight: bold; display: block;">CURRENT TURN IN PROGRESS</span>
@@ -456,7 +452,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
         <div id="winner-details" style="font-size: 1rem; line-height: 1.5;">Victory reason and tiebreakers...</div>
       </div>
 
-      <!-- CRISIS BANNER (Removed completely once Crisis Phase is over) -->
+      <!-- CRISIS BANNER -->
       <div id="crisis-display" class="crisis-banner" style="display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center;">
           <span class="badge" style="background: #ef4444; color: #fff; font-size: 0.85rem;">CRISIS ALERT #<span id="crisis-num">1</span></span>
@@ -468,7 +464,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
           Effect details...
         </div>
 
-        <!-- Student Interactive Crisis Resolution Options with Hand Validation -->
+        <!-- Team Crisis Resolution Box -->
         <div id="crisis-team-options" class="crisis-resolution-box">
           <h4 id="crisis-options-header" style="color: #fca5a5; margin-bottom: 8px;">TEAM CRISIS DECISION:</h4>
           <div id="crisis-action-buttons" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
@@ -476,7 +472,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
             ⏳ Waiting for Facilitator to cycle to your team's crisis turn...
           </div>
           <div id="crisis-resolved-note" style="display: none; color: #34d399; font-weight: bold; margin-top: 8px;">
-            ✓ Crisis decision recorded for this phase.
+            ✓ Crisis decision finalized for this phase.
           </div>
         </div>
       </div>
@@ -486,7 +482,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
         ⚠️ ACTION TURN SKIPPED: This team failed to resolve the prior crisis and must sit out this Action Phase!
       </div>
 
-      <!-- DYNAMIC BOARDROOM DASHBOARD (Changes with toggled team on Facilitator view) -->
+      <!-- DYNAMIC BOARDROOM DASHBOARD -->
       <div id="my-team-dashboard" style="background: var(--bg-panel); border-radius: 12px; padding: 20px; border: 1px solid #334155; margin-bottom: 20px;">
         <div style="display: flex; justify-content: space-between; align-items: center;">
           <div>
@@ -496,19 +492,19 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
           <div>Score: <strong id="my-team-points" style="color: var(--accent-gold); font-size: 1.3rem;">0</strong> PTS</div>
         </div>
 
-        <!-- Turn Wait Notice for Inactive Teams -->
+        <!-- Turn Wait Notice -->
         <div id="turn-wait-banner" style="display: none; background: #1e293b; border: 1px dashed var(--accent-cyan); border-radius: 8px; padding: 10px; margin: 12px 0; color: #38bdf8; font-size: 0.9rem;">
           ⏳ <strong>WAITING FOR YOUR TURN:</strong> Spotlight is currently on <span id="turn-wait-team-name">Team 1</span>. Discuss strategy with your team!
         </div>
 
-        <!-- Mission Picker (When no mission is active) -->
+        <!-- Mission Picker -->
         <div id="mission-select-container" style="margin: 15px 0; background: #090e17; padding: 15px; border-radius: 10px; border: 1px dashed #06b6d4; display: none;">
           <h4 style="color: var(--accent-cyan); margin-bottom: 6px;">SELECT NEXT MISSION TO FOCUS ON:</h4>
           <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 12px;">Teams focus on ONE mission at a time until completed.</p>
           <div id="available-mission-buttons" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
         </div>
 
-        <!-- CURRENT ACTIVE MISSION BOARD -->
+        <!-- Current Mission Board -->
         <div id="active-mission-container" style="background: #090e17; border: 1px solid #334155; border-radius: 10px; padding: 16px; margin: 15px 0; display: none;">
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <div>
@@ -517,13 +513,13 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
             </div>
             <span id="active-mission-value-badge" class="badge badge-budget">10 PTS</span>
           </div>
-          <p style="font-size: 0.85rem; color: #94a3b8; margin: 8px 0;">
+          <p id="mission-work-instructions" style="font-size: 0.85rem; color: #94a3b8; margin: 8px 0;">
             Non-sequential fulfillment: Select a matching card from the hand below, then click <strong>any open slot</strong> to fill it.
           </p>
           <div id="active-mission-slots" class="slots-container"></div>
         </div>
 
-        <!-- Completed Missions Summary Tag -->
+        <!-- Completed Missions -->
         <div style="margin: 10px 0; font-size: 0.85rem; color: #94a3b8;">
           Completed Missions: <span id="completed-missions-list" style="color: #34d399; font-weight: bold;">None</span>
         </div>
@@ -532,26 +528,23 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
         <div style="margin-top: 20px;">
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <h4>Resource Cards in Hand (<span id="hand-count">0</span>)</h4>
-            <span style="font-size: 0.85rem; color: #94a3b8;">1. Select card → 2. Tap highlighted slot above (or Discard during Crisis)</span>
+            <span id="hand-instructions" style="font-size: 0.85rem; color: #94a3b8;">Click card to select</span>
           </div>
           <div id="my-hand-cards" class="hand-container"></div>
         </div>
 
-        <!-- Action Controls: Discard disabled during Action Phase -->
+        <!-- Action Controls -->
         <div id="player-action-controls" style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
           <button class="btn-gold" id="btn-draw-resources" onclick="clientDrawResources()">Draw 2 Resource Cards</button>
-          <button class="btn-red" id="btn-discard-card" onclick="clientDiscardCard()" disabled title="Discarding is only permitted during Crisis Phase">
-            Discard Selected Card (Crisis Only)
-          </button>
         </div>
       </div>
 
-      <!-- All Teams Overview (Leaderboard with Team Members) -->
+      <!-- All Teams Overview -->
       <h3>Galaxy Boardroom: All Teams Overview</h3>
       <div id="all-teams-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 10px;"></div>
     </div>
 
-    <!-- SIDEBAR: DECKS, TURN CYCLING, & STREAMLINED FACILITATOR CONTROLS -->
+    <!-- SIDEBAR -->
     <div>
       <div style="background: var(--bg-panel); border-radius: 12px; padding: 18px; border: 1px solid #334155; margin-bottom: 20px;">
         <h4>CENTRAL DECKS</h4>
@@ -575,7 +568,6 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
       <div id="host-controls-panel" class="host-panel" style="display: none;">
         <h4 style="color: var(--accent-gold); margin-bottom: 12px;">FACILITATOR CONTROLS</h4>
         
-        <!-- TURN PACING & TEAM TOGGLING -->
         <div style="background: #090e17; padding: 10px; border-radius: 8px; border: 1px solid var(--accent-cyan); margin-bottom: 12px;">
           <span style="font-size: 0.8rem; color: #94a3b8; font-weight: bold;">TOGGLE & FOCUS TEAM:</span>
           <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-top: 6px;">
@@ -589,7 +581,6 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
           </button>
         </div>
 
-        <!-- STREAMLINED PHASE CONTROL BUTTONS (Requirement c) -->
         <div style="display: flex; flex-direction: column; gap: 10px;">
           <div id="phase-action-control-box">
             <button id="btn-host-action-crisis" class="btn-red" style="width: 100%;" onclick="hostTriggerNextCrisis()">
@@ -598,6 +589,14 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
           </div>
 
           <div id="phase-crisis-control-box" style="display: none;">
+            <!-- Special Crisis 14 / 15 actions -->
+            <button id="btn-host-c14-reveal" class="btn-gold" style="width: 100%; display: none; margin-bottom: 6px;" onclick="hostResolveCrisis14Bids()">
+              💰 Reveal Bids & Award AI Specialists
+            </button>
+            <button id="btn-host-c15-exec" class="btn-gold" style="width: 100%; display: none; margin-bottom: 6px;" onclick="hostExecuteCrisis15()">
+              ⚖️ Execute Digital Transparency Act
+            </button>
+
             <button class="btn-green" style="width: 100%;" onclick="hostConcludeCrisisAndStartAction()">
               ▶️ Start Next Action Phase
             </button>
@@ -615,26 +614,26 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
             🏆 End Game & Announce Winner
           </button>
 
-          <!-- UNDO BUTTONS PER TEAM -->
+          <!-- Undo per team -->
           <div style="border-top: 1px solid #334155; padding-top: 10px; margin-top: 6px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
               <span style="font-size: 0.85rem; font-weight: bold; color: var(--accent-gold);">UNDO ACTIONS:</span>
               <span style="font-size: 0.75rem; color: #94a3b8;">Revert misclicks</span>
             </div>
             <div class="undo-bar">
-              <span style="font-size: 0.85rem;">Team 1: Vanguard</span>
+              <span style="font-size: 0.85rem;">Team 1</span>
               <button class="btn-red" style="padding: 4px 10px; font-size: 0.75rem;" onclick="hostUndoTeamAction(1)">Undo T1</button>
             </div>
             <div class="undo-bar">
-              <span style="font-size: 0.85rem;">Team 2: FinTech</span>
+              <span style="font-size: 0.85rem;">Team 2</span>
               <button class="btn-red" style="padding: 4px 10px; font-size: 0.75rem;" onclick="hostUndoTeamAction(2)">Undo T2</button>
             </div>
             <div class="undo-bar">
-              <span style="font-size: 0.85rem;">Team 3: HealthTech</span>
+              <span style="font-size: 0.85rem;">Team 3</span>
               <button class="btn-red" style="padding: 4px 10px; font-size: 0.75rem;" onclick="hostUndoTeamAction(3)">Undo T3</button>
             </div>
             <div class="undo-bar">
-              <span style="font-size: 0.85rem;">Team 4: Quantum</span>
+              <span style="font-size: 0.85rem;">Team 4</span>
               <button class="btn-red" style="padding: 4px 10px; font-size: 0.75rem;" onclick="hostUndoTeamAction(4)">Undo T4</button>
             </div>
           </div>
@@ -644,7 +643,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
           </div>
         </div>
 
-        <!-- Live Facilitator Audit Feed -->
+        <!-- Live Audit -->
         <div style="border-top: 1px solid #334155; margin-top: 15px; padding-top: 10px;">
           <h5 style="color: var(--accent-cyan); margin-bottom: 6px;">LIVE TEAM ACTIONS AUDIT:</h5>
           <div id="host-action-log" style="max-height: 160px; overflow-y: auto; font-size: 0.78rem; background: #090e17; padding: 8px; border-radius: 6px; border: 1px solid #334155; display: flex; flex-direction: column; gap: 4px;">
@@ -656,7 +655,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
   </div>
 </div>
 
-<!-- Facilitator Modal -->
+<!-- Modal Facilitator Pool -->
 <div id="modal-fac-pool" class="modal-overlay" style="display: none;">
   <div class="modal-content">
     <h3>Facilitator Pool Grant</h3>
@@ -680,7 +679,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
   </div>
 </div>
 
-<!-- QR Modal -->
+<!-- Modal QR -->
 <div id="modal-qr" class="modal-overlay" style="display: none;">
   <div class="modal-content">
     <h3>Scan to Join Room</h3>
@@ -692,30 +691,28 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
 </div>
 
 <script>
-// MISSION DEFINITIONS
 const MISSION_SPECS = {
   alpha: { id: 'alpha', name: 'Alpha (High Value)', value: 10, slots: ['BUDGET', 'DATA', 'INNOVATION', 'BUDGET', 'DATA', 'INNOVATION', 'DATA'] },
   gamma: { id: 'gamma', name: 'Gamma (Medium Value)', value: 7, slots: ['INNOVATION', 'BUDGET', 'BUDGET', 'DATA', 'INNOVATION', 'BUDGET', 'DATA'] },
   beta: { id: 'beta', name: 'Beta (Low Value)', value: 4, slots: ['COMPLIANCE', 'BUDGET', 'DATA', 'COMPLIANCE', 'BUDGET', 'DATA'] }
 };
 
-// 15 CRISES FROM PRESENTATION SLIDES
 const CRISIS_DECK = [
   { id: 1, name: "Budget Cut", flavor: "The CFO is cutting cost across all departments.", effect: "Discard 2 Budget Cards immediately." },
   { id: 2, name: "Tech Debt Comes Due", flavor: "Legacy systems are failing under heavy load.", effect: "Discard 1 Budget + 1 Random Resource Card." },
-  { id: 3, name: "Scope Creep", flavor: "Stakeholders keep adding new requirements.", effect: "ACTIVE: Add 1 Data + 1 Budget requirement to your current mission.", action: "scope_creep" },
-  { id: 4, name: "Innovation Trap", flavor: "A shiny object technology promises to solve all problems.", effect: "Gain 2 Innovation Cards OR remove all progress from your active mission." },
-  { id: 5, name: "Slow Burn Security Flaw", flavor: "A minor security flaw discovered. Lasts TWO rounds.", effect: "Round 1: Discard 1 Data. (Spend 2 Compliance + 1 Budget to remove entirely)." },
-  { id: 6, name: "Digital Skill Gap", flavor: "Senior leadership lacks digital literacy.", effect: "Choose: Train (Discard 2 Budget for 2 Innovation), Hire (Discard 1 of each card for 1 Progress), or Do Nothing." },
-  { id: 7, name: "The Patent Race", flavor: "Competitor is filing identical technology!", effect: "First team to discard 3 Innovation + 1 Budget immediately gains 2 progress units & draws 2 cards." },
-  { id: 8, name: "Rule Reset", flavor: "A global black swan event reshapes the industry.", effect: "Work on Mission requires TWICE normal resources. Draw Resources draws 3 cards." },
-  { id: 9, name: "Market Disruption", flavor: "Competitor launch makes mission obsolete.", effect: "Mission Value drops by 2 points. (Spend 1 Innovation + 1 Budget to negate)." },
-  { id: 10, name: "Resource Snipe", flavor: "Critical component shortage creates seller's market.", effect: "Forced Draw 2 cards. Swap 2 cards with the next team." },
+  { id: 3, name: "Scope Creep", flavor: "Stakeholders keep adding new requirements.", effect: "ACTIVE: 1 Data + 1 Budget resource requirement automatically added to your current mission.", action: "scope_creep" },
+  { id: 4, name: "Innovation Trap", flavor: "A shiny object technology promises to solve all problems.", effect: "Gain 2 Innovation Cards OR wipe all progress from your active mission." },
+  { id: 5, name: "Slow Burn Security Flaw", flavor: "A minor security flaw discovered. Lasts TWO rounds.", effect: "Discard 1 Data Card, OR spend 2 Compliance + 1 Budget to eliminate the flaw completely." },
+  { id: 6, name: "Digital Skill Gap", flavor: "Senior leadership lacks digital literacy.", effect: "Train (Discard 2 Budget for 2 Innovation) OR Hire (Discard 1 of each card for 1 Progress Unit)." },
+  { id: 7, name: "The Patent Race", flavor: "Competitor is filing identical technology! First to file wins.", effect: "SIMULTANEOUS: First team to discard 3 Innovation + 1 Budget gains 2 progress units & draws 2 cards!" },
+  { id: 8, name: "Rule Reset", flavor: "A global black swan event reshapes the industry.", effect: "Work on Mission requires 2x matching resources. Draw Resources draws 3 cards." },
+  { id: 9, name: "Market Disruption", flavor: "Competitor launch makes mission obsolete.", effect: "Spend 1 Innovation + 1 Budget to cancel, or current mission value drops by 2 points." },
+  { id: 10, name: "Resource Snipe", flavor: "Critical component shortage creates seller's market.", effect: "Inspect the next team's hand. Select 2 cards from your hand and swap with 2 of theirs." },
   { id: 11, name: "The Great Resignation", flavor: "Mid-level leadership has been poached.", effect: "Discard cards based on completed missions: 0 missions = 1 card, 1 mission = 2 cards, 2 missions = 3 cards." },
-  { id: 12, name: "Regulatory Scrutiny", flavor: "Antitrust investigation underway.", effect: "Team with most progress must discard 3 Compliance Cards, or ALL other teams draw 2 cards." },
-  { id: 13, name: "Ecosystem Partnership", flavor: "Platform giant offers strategic partnership.", effect: "Choose: Remain independent OR Form partnership (+2 progress, but reduce all mission values by 3 pts)." },
-  { id: 14, name: "The Bidding War", flavor: "Top AI specialists are on the market.", effect: "Secretly bid Budget cards. Highest bidder gains 3 progress units." },
-  { id: 15, name: "The Digital Transparency Act", flavor: "New algorithmic disclosure laws enacted.", effect: "Most compliant team gains 2 Budget. Least compliant team loses 1 Innovation." }
+  { id: 12, name: "Regulatory Scrutiny", flavor: "Antitrust investigation underway for market leaders.", effect: "Team with the most progress must discard 3 Compliance Cards, or ALL other teams draw 2 cards." },
+  { id: 13, name: "Ecosystem Partnership", flavor: "Platform giant offers strategic partnership.", effect: "Choose: Remain Independent OR Form Partnership (+2 progress units on active mission, but reduces all mission values by 3 pts)." },
+  { id: 14, name: "The Bidding War", flavor: "Top AI specialists are on the market.", effect: "Secretly bid Budget cards. Highest bidder discards bid and gains 3 progress units (no overspill)." },
+  { id: 15, name: "The Digital Transparency Act", flavor: "New algorithmic disclosure laws enacted.", effect: "Team with most compliance gains 2 Budget. Least compliant loses 1 Innovation (Facilitator evaluated)." }
 ];
 
 let isHost = false;
@@ -723,9 +720,7 @@ let isSolo = false;
 let mqttClient = null;
 let myTeamId = 1;
 let myPlayerName = "Board Member";
-let selectedCardIndex = null;
-
-// State history for Facilitator Undo
+let selectedHandIndices = []; // Multi-select support for Crisis 8, 10, 11
 let teamActionHistory = { 1: [], 2: [], 3: [], 4: [] };
 
 let gameState = {
@@ -737,6 +732,8 @@ let gameState = {
   drawDeck: [],
   discardDeck: [],
   winnerDeclared: null,
+  patentRaceClaimed: false,
+  crisis14Bids: {}, // { 1: bid, 2: bid }
   facilitatorPool: { BUDGET: 8, DATA: 8, INNOVATION: 7, COMPLIANCE: 7 },
   teams: {
     1: createDefaultTeamState("Alpha Cyber Vanguard"),
@@ -758,11 +755,11 @@ function createDefaultTeamState(name) {
     activeMissionKey: null,
     activeMissionFilledSlots: [],
     scopeCreepAdded: [],
-    completedMissions: []
+    completedMissions: [],
+    missionValuePenalty: 0
   };
 }
 
-// Audio chime for Facilitator popouts
 function playAlertBeep(isAlert = false) {
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -779,12 +776,11 @@ function playAlertBeep(isAlert = false) {
   } catch(e) {}
 }
 
-// Facilitator Popout Toast
 function showFacilitatorToast(message, type = "info") {
   const container = document.getElementById('toast-container');
   const toast = document.createElement('div');
   toast.className = `toast-msg ${type}`;
-  toast.innerHTML = `<div style="font-size:0.75rem; color:#94a3b8; font-weight:bold;">DECISION NOTIFICATION</div><div>${message}</div>`;
+  toast.innerHTML = `<div style="font-size:0.75rem; color:#94a3b8; font-weight:bold;">NOTIFICATION</div><div>${message}</div>`;
   container.appendChild(toast);
   playAlertBeep(type === 'alert');
 
@@ -807,7 +803,6 @@ function showFacilitatorToast(message, type = "info") {
   }, 5000);
 }
 
-// Snapshot for Undo
 function snapshotTeamState(teamId, actionDesc) {
   if (!isHost) return;
   teamActionHistory[teamId].push({
@@ -837,20 +832,13 @@ function hostUndoTeamAction(teamId) {
   broadcastGameState();
 }
 
-/* =========================================================================
-   INITIALIZATION & LOBBY
-   ========================================================================= */
-
 window.addEventListener('load', () => {
   const urlParams = new URLSearchParams(window.location.search);
   const r = urlParams.get('room');
   if (r) document.getElementById('join-room-code').value = r.toUpperCase();
 
-  // Check if there was a previously hosted room saved in localStorage
   const savedRoom = localStorage.getItem('galaxy_host_room');
-  if (savedRoom) {
-    document.getElementById('resume-room-code').value = savedRoom;
-  }
+  if (savedRoom) document.getElementById('resume-room-code').value = savedRoom;
 });
 
 function switchLobbyTab(tab) {
@@ -887,9 +875,7 @@ function drawCardsForTeam(teamId, count) {
           const k = Math.floor(Math.random() * (j + 1));
           [gameState.drawDeck[j], gameState.drawDeck[k]] = [gameState.drawDeck[k], gameState.drawDeck[j]];
         }
-      } else {
-        break;
-      }
+      } else break;
     }
     if (gameState.drawDeck.length > 0) {
       team.hand.push(gameState.drawDeck.pop());
@@ -902,10 +888,6 @@ function dealStartingCards() {
     drawCardsForTeam(teamId, 5);
   }
 }
-
-/* =========================================================================
-   MQTT REALTIME NETWORKING & FACILITATOR RESUME
-   ========================================================================= */
 
 function connectMqtt(onConnectCb) {
   const broker = 'wss://broker.hivemq.com:8884/mqtt';
@@ -938,8 +920,6 @@ function startHostGame() {
 
   initMainDeck();
   dealStartingCards();
-
-  // Save room code in localStorage for easy resume
   localStorage.setItem('galaxy_host_room', roomCode);
 
   document.getElementById('host-status').innerText = "Connecting to boardroom cloud...";
@@ -952,8 +932,7 @@ function startHostGame() {
     mqttClient.on('message', (topic, payload) => {
       if (topic === topicAction) {
         try {
-          const data = JSON.parse(payload.toString());
-          handleHostReceiveData(data);
+          handleHostReceiveData(JSON.parse(payload.toString()));
         } catch(e) { console.error(e); }
       }
     });
@@ -970,7 +949,6 @@ function startHostGame() {
   });
 }
 
-// RESUME FACILITATOR SESSION (Requirement b)
 function resumeHostGame() {
   const code = document.getElementById('resume-room-code').value.trim().toUpperCase();
   if (code.length !== 6) {
@@ -1010,17 +988,10 @@ function resumeHostGame() {
         } catch(e) { console.error(e); }
       } else if (topic === topicAction) {
         try {
-          const data = JSON.parse(payload.toString());
-          handleHostReceiveData(data);
+          handleHostReceiveData(JSON.parse(payload.toString()));
         } catch(e) { console.error(e); }
       }
     });
-
-    setTimeout(() => {
-      if (!receivedRetainedState) {
-        document.getElementById('host-status').innerHTML = `<span style="color:var(--accent-red)">Could not locate room "${code}". Ensure code is correct.</span>`;
-      }
-    }, 4000);
   });
 }
 
@@ -1028,14 +999,13 @@ function joinAsStudent() {
   const code = document.getElementById('join-room-code').value.trim().toUpperCase();
   const name = document.getElementById('player-name').value.trim() || "Agent";
   const team = parseInt(document.getElementById('select-team').value);
-  const statusEl = document.getElementById('join-status');
 
   if (code.length !== 6) {
     alert("Please enter a 6-character room code.");
     return;
   }
 
-  statusEl.innerText = "Connecting to room " + code + "...";
+  document.getElementById('join-status').innerText = "Connecting to room " + code + "...";
   isHost = false;
   isSolo = false;
   myTeamId = team;
@@ -1074,7 +1044,7 @@ function broadcastGameState() {
 }
 
 /* =========================================================================
-   HOST ACTION HANDLER
+   HOST RECEIVE ACTIONS & ACCURATE LOGIC
    ========================================================================= */
 
 function handleHostReceiveData(data) {
@@ -1099,67 +1069,58 @@ function handleHostReceiveData(data) {
       broadcastGameState();
       break;
 
-    // NON-SEQUENTIAL SLOT FILLING ON ACTIVE MISSION
     case 'ACTION_FILL_ACTIVE_SLOT':
       snapshotTeamState(data.teamId, `Filled slot on active mission`);
       {
         const slotIndex = data.slotIndex;
-        const playedCard = t.hand[data.cardIndex];
+        const playedCardIndices = data.cardIndices; // Array of 1 or 2 indices
         const mission = MISSION_SPECS[t.activeMissionKey];
         const allSlots = [...mission.slots, ...(t.scopeCreepAdded || [])];
         const requiredSlotType = allSlots[slotIndex];
 
-        if (playedCard === requiredSlotType && !t.activeMissionFilledSlots.includes(slotIndex)) {
-          t.hand.splice(data.cardIndex, 1);
-          gameState.discardDeck.push(playedCard);
-          t.activeMissionFilledSlots.push(slotIndex);
+        // Sort indices descending for safe splice
+        playedCardIndices.sort((a, b) => b - a);
+        playedCardIndices.forEach(idx => {
+          const removed = t.hand.splice(idx, 1)[0];
+          gameState.discardDeck.push(removed);
+        });
 
-          showFacilitatorToast(`🎯 Team ${data.teamId} played ${playedCard} to ${mission.name}!`, 'success');
+        t.activeMissionFilledSlots.push(slotIndex);
+        showFacilitatorToast(`🎯 Team ${data.teamId} played resources to fill ${requiredSlotType} on ${mission.name}!`, 'success');
 
-          if (t.activeMissionFilledSlots.length === allSlots.length) {
-            t.points += mission.value;
-            t.completedMissions.push(t.activeMissionKey);
-            showFacilitatorToast(`🏆 Team ${data.teamId} COMPLETED ${mission.name} (+${mission.value} PTS)!`, 'gold');
-            
-            t.activeMissionKey = null;
-            t.activeMissionFilledSlots = [];
-            t.scopeCreepAdded = [];
+        if (t.activeMissionFilledSlots.length === allSlots.length) {
+          const finalVal = Math.max(0, mission.value - (t.missionValuePenalty || 0));
+          t.points += finalVal;
+          t.completedMissions.push(t.activeMissionKey);
+          showFacilitatorToast(`🏆 Team ${data.teamId} COMPLETED ${mission.name} (+${finalVal} PTS)!`, 'gold');
+          
+          t.activeMissionKey = null;
+          t.activeMissionFilledSlots = [];
+          t.scopeCreepAdded = [];
 
-            if (t.completedMissions.length >= 3) {
-              hostEvaluateWinner();
-            }
-          }
-
-          t.actionTakenThisRound = true;
-          broadcastGameState();
+          if (t.completedMissions.length >= 3) hostEvaluateWinner();
         }
-      }
-      break;
 
-    case 'ACTION_DRAW':
-      snapshotTeamState(data.teamId, 'Drew 2 Resource Cards');
-      drawCardsForTeam(data.teamId, 2);
-      t.actionTakenThisRound = true;
-      showFacilitatorToast(`📦 Team ${data.teamId} drew 2 Resource Cards`);
-      broadcastGameState();
-      break;
-
-    case 'ACTION_DISCARD':
-      snapshotTeamState(data.teamId, 'Discarded Card during Crisis');
-      if (data.cardIndex !== null && data.cardIndex < t.hand.length) {
-        const discarded = t.hand.splice(data.cardIndex, 1)[0];
-        gameState.discardDeck.push(discarded);
-        showFacilitatorToast(`🗑️ Team ${data.teamId} discarded 1 ${discarded} card during Crisis`);
+        t.actionTakenThisRound = true;
         broadcastGameState();
       }
       break;
 
-    // CRISIS DECISIONS & REAL CARD DEDUCTIONS (Requirement e)
+    case 'ACTION_DRAW':
+      snapshotTeamState(data.teamId, 'Drew Resource Cards');
+      // Crisis 8: Draw 3 instead of 2
+      const drawQty = (gameState.activeCrisis && gameState.activeCrisis.id === 8) ? 3 : 2;
+      drawCardsForTeam(data.teamId, drawQty);
+      t.actionTakenThisRound = true;
+      showFacilitatorToast(`📦 Team ${data.teamId} drew ${drawQty} Resource Cards`);
+      broadcastGameState();
+      break;
+
     case 'CRISIS_FULFILLED':
       snapshotTeamState(data.teamId, `Fulfilled Crisis: ${data.detail}`);
       t.crisisResolvedThisPhase = true;
 
-      // Deduct required cards from hand if specified
+      // Real card deductions
       if (data.deductCards && data.deductCards.length > 0) {
         data.deductCards.forEach(type => {
           const idx = t.hand.indexOf(type);
@@ -1170,6 +1131,67 @@ function handleHostReceiveData(data) {
         });
       }
 
+      // Crisis 4 wipe progression
+      if (data.action === 'crisis4_wipe') {
+        t.activeMissionFilledSlots = [];
+      }
+      // Crisis 4 gain 2 Innovation cards directly
+      if (data.action === 'crisis4_gain_inno') {
+        t.hand.push('INNOVATION', 'INNOVATION');
+      }
+
+      // Crisis 6 Hire
+      if (data.action === 'crisis6_hire') {
+        addProgressUnitsToTeam(data.teamId, 1);
+      }
+      // Crisis 6 Train
+      if (data.action === 'crisis6_train') {
+        t.hand.push('INNOVATION', 'INNOVATION');
+      }
+
+      // Crisis 7 Patent Race
+      if (data.action === 'crisis7_race') {
+        gameState.patentRaceClaimed = true;
+        addProgressUnitsToTeam(data.teamId, 2);
+        drawCardsForTeam(data.teamId, 2);
+        showFacilitatorToast(`⚡ TEAM ${data.teamId} WON THE PATENT RACE! (+2 Progress, +2 Cards)`, 'gold');
+      }
+
+      // Crisis 9 penalty
+      if (data.action === 'crisis9_penalty') {
+        t.missionValuePenalty = (t.missionValuePenalty || 0) + 2;
+      }
+
+      // Crisis 10 swap
+      if (data.action === 'crisis10_swap') {
+        const nextId = (data.teamId % 4) + 1;
+        const nextTeam = gameState.teams[nextId];
+        // data.myCards, data.theirCards
+        data.myCards.forEach(c => {
+          const idx = t.hand.indexOf(c);
+          if (idx > -1) t.hand.splice(idx, 1);
+          nextTeam.hand.push(c);
+        });
+        data.theirCards.forEach(c => {
+          const idx = nextTeam.hand.indexOf(c);
+          if (idx > -1) nextTeam.hand.splice(idx, 1);
+          t.hand.push(c);
+        });
+        showFacilitatorToast(`🔄 Team ${data.teamId} swapped 2 cards with Team ${nextId}!`);
+      }
+
+      // Crisis 13 partnership
+      if (data.action === 'crisis13_partner') {
+        addProgressUnitsToTeam(data.teamId, 2);
+        t.missionValuePenalty = (t.missionValuePenalty || 0) + 3;
+      }
+
+      // Crisis 14 submit secret bid
+      if (data.action === 'crisis14_bid') {
+        gameState.crisis14Bids[data.teamId] = data.bid;
+        showFacilitatorToast(`🔒 Team ${data.teamId} submitted secret bid.`);
+      }
+
       showFacilitatorToast(`✅ Team ${data.teamId} resolved Crisis: ${data.detail}`, 'success');
       broadcastGameState();
       break;
@@ -1177,10 +1199,24 @@ function handleHostReceiveData(data) {
     case 'CRISIS_FAILED_SKIP':
       snapshotTeamState(data.teamId, 'Failed Crisis (Will Skip Next Action)');
       t.crisisResolvedThisPhase = true;
-      t.skipNextAction = true;
+      t.skipNextAction = true; // Consumed during next action turn!
       showFacilitatorToast(`⚠️ Team ${data.teamId} could not fulfil crisis and WILL SKIP NEXT ACTION TURN!`, 'alert');
       broadcastGameState();
       break;
+  }
+}
+
+function addProgressUnitsToTeam(teamId, count) {
+  const t = gameState.teams[teamId];
+  if (!t || !t.activeMissionKey) return;
+  const spec = MISSION_SPECS[t.activeMissionKey];
+  const allSlots = [...spec.slots, ...(t.scopeCreepAdded || [])];
+  for (let i = 0; i < allSlots.length; i++) {
+    if (!t.activeMissionFilledSlots.includes(i)) {
+      t.activeMissionFilledSlots.push(i);
+      count--;
+      if (count === 0) break;
+    }
   }
 }
 
@@ -1203,19 +1239,27 @@ function startSoloTest() {
 function switchSimulatedTeam(teamId) {
   myTeamId = teamId;
   gameState.activeTurnTeamId = teamId;
-  selectedCardIndex = null;
+  selectedHandIndices = [];
   renderUI();
 }
 
 /* =========================================================================
-   FACILITATOR CONTROLS & STREAMLINED PHASES (Requirement c & d)
+   FACILITATOR PACING & LOOPING
    ========================================================================= */
 
-// Requirement a: Toggling team on Facilitator automatically switches boardroom view!
 function hostSetTurn(teamId) {
   if (!isHost) return;
   gameState.activeTurnTeamId = teamId;
-  selectedCardIndex = null;
+  selectedHandIndices = [];
+
+  // Consume skip turn penalty if team was penalized!
+  const currentTeam = gameState.teams[teamId];
+  if (gameState.phase === 'ACTION' && currentTeam.skipNextAction) {
+    currentTeam.actionTakenThisRound = true;
+    currentTeam.skipNextAction = false; // CONSUMED! Team 2 won't skip forever anymore!
+    showFacilitatorToast(`🚫 Team ${teamId}'s turn was forfeited due to previous crisis penalty.`, 'alert');
+  }
+
   showFacilitatorToast(`👉 Switched Boardroom Focus to Team ${teamId} (${gameState.teams[teamId].name})`);
   broadcastGameState();
 }
@@ -1227,51 +1271,59 @@ function hostCycleNextTurn() {
   hostSetTurn(next);
 }
 
-// Requirement c: Streamlined Crisis Trigger
 function hostTriggerNextCrisis() {
+  // Loop back to crisis 1 after crisis 15
   if (gameState.currentCrisisIndex >= CRISIS_DECK.length) {
-    alert("All 15 crises completed! Facilitator can now evaluate the final winner.");
-    return;
+    gameState.currentCrisisIndex = 0;
+    showFacilitatorToast(`🔄 Rotated back to Crisis #1 for ongoing game!`, 'gold');
   }
+
   const crisis = CRISIS_DECK[gameState.currentCrisisIndex];
   gameState.activeCrisis = crisis;
   gameState.currentCrisisIndex++;
   gameState.phase = 'CRISIS';
   gameState.activeTurnTeamId = 1;
+  gameState.patentRaceClaimed = false;
+  gameState.crisis14Bids = {};
 
   for (let id in gameState.teams) {
     gameState.teams[id].crisisResolvedThisPhase = false;
   }
 
-  if (crisis.action === 'scope_creep') {
+  // Crisis 3: Automatically apply scope creep
+  if (crisis.id === 3) {
     for (let id in gameState.teams) {
       if (gameState.teams[id].activeMissionKey) {
         gameState.teams[id].scopeCreepAdded.push('DATA', 'BUDGET');
       }
+      gameState.teams[id].crisisResolvedThisPhase = true; // No action needed for teams!
     }
   }
 
-  showFacilitatorToast(`🚨 CRISIS #${crisis.id}: "${crisis.name}" drawn! Reviewing Team 1 first.`, 'alert');
+  showFacilitatorToast(`🚨 CRISIS #${crisis.id}: "${crisis.name}" drawn!`, 'alert');
   broadcastGameState();
 }
 
-// Requirement c & d: Conclude Crisis Phase, Remove Alert, and Start Action Phase
 function hostConcludeCrisisAndStartAction() {
   if (!isHost) return;
   gameState.phase = 'ACTION';
-  gameState.activeCrisis = null; // Requirement d: Remove crisis alert banner!
-  gameState.activeTurnTeamId = 1; // Reset turn to Team 1
+  gameState.activeCrisis = null; // Clear crisis alert banner!
+  gameState.activeTurnTeamId = 1;
 
   for (let id in gameState.teams) {
     const tm = gameState.teams[id];
     tm.actionTakenThisRound = false;
     tm.crisisResolvedThisPhase = false;
-    if (tm.skipNextAction) {
-      showFacilitatorToast(`🚫 Team ${id}'s turn is SKIPPED this round due to crisis penalty!`, 'alert');
-    }
   }
 
-  showFacilitatorToast(`▶️ Action Phase started! Boardroom focus set to Team 1.`);
+  // Check Team 1 penalty
+  if (gameState.teams[1].skipNextAction) {
+    gameState.teams[1].actionTakenThisRound = true;
+    gameState.teams[1].skipNextAction = false;
+    showFacilitatorToast(`🚫 Team 1 turn forfeited.`, 'alert');
+  }
+
+  showFacilitatorToast(`▶️ Action Phase started! Boardroom focus on Team 1.`);
   broadcastGameState();
 }
 
@@ -1280,7 +1332,7 @@ function hostResetRound() {
     gameState.teams[id].actionTakenThisRound = false;
     gameState.teams[id].skipNextAction = false;
   }
-  showFacilitatorToast("🔄 All team action turns unlocked for this phase.");
+  showFacilitatorToast("🔄 All team actions reset.");
   broadcastGameState();
 }
 
@@ -1324,8 +1376,73 @@ function toggleProjectorView() {
 }
 
 /* =========================================================================
-   WINNER EVALUATION ENGINE (OFFICIAL RULES & TIEBREAKERS)
+   SPECIAL CRISIS FACILITATOR ACTIONS (CRISIS 14 & 15)
    ========================================================================= */
+
+function hostResolveCrisis14Bids() {
+  const bids = gameState.crisis14Bids;
+  let maxBid = -1;
+  let winnerTeamId = null;
+
+  for (let tid in bids) {
+    if (bids[tid] > maxBid) {
+      maxBid = bids[tid];
+      winnerTeamId = parseInt(tid);
+    }
+  }
+
+  if (winnerTeamId && maxBid > 0) {
+    const wTeam = gameState.teams[winnerTeamId];
+    // Deduct bid budget cards
+    for (let i = 0; i < maxBid; i++) {
+      const idx = wTeam.hand.indexOf('BUDGET');
+      if (idx > -1) {
+        const removed = wTeam.hand.splice(idx, 1)[0];
+        gameState.discardDeck.push(removed);
+      }
+    }
+    addProgressUnitsToTeam(winnerTeamId, 3); // Capped at current mission, no overspill
+    showFacilitatorToast(`🏆 TEAM ${winnerTeamId} WON BIDDING WAR with ${maxBid} Budget Cards! (+3 Progress Units)`, 'gold');
+  } else {
+    showFacilitatorToast(`No team bid any Budget cards for Crisis 14.`);
+  }
+  broadcastGameState();
+}
+
+function hostExecuteCrisis15() {
+  // Team with most compliance gains 2 budget. Least loses 1 innovation.
+  let counts = [];
+  for (let id = 1; id <= 4; id++) {
+    const t = gameState.teams[id];
+    let compCount = t.hand.filter(c => c === 'COMPLIANCE').length;
+    if (t.activeMissionKey) {
+      const spec = MISSION_SPECS[t.activeMissionKey];
+      t.activeMissionFilledSlots.forEach(idx => {
+        if (spec.slots[idx] === 'COMPLIANCE') compCount++;
+      });
+    }
+    counts.push({ id: id, count: compCount });
+  }
+
+  counts.sort((a, b) => b.count - a.count);
+  const mostCompTeamId = counts[0].id;
+  const leastCompTeamId = counts[counts.length - 1].id;
+
+  // Award 2 budget
+  gameState.teams[mostCompTeamId].hand.push('BUDGET', 'BUDGET');
+
+  // Deduct 1 innovation
+  const innoIdx = gameState.teams[leastCompTeamId].hand.indexOf('INNOVATION');
+  if (innoIdx > -1) {
+    const rm = gameState.teams[leastCompTeamId].hand.splice(innoIdx, 1)[0];
+    gameState.discardDeck.push(rm);
+  }
+
+  for (let id = 1; id <= 4; id++) gameState.teams[id].crisisResolvedThisPhase = true;
+
+  showFacilitatorToast(`⚖️ DIGITAL TRANSPARENCY ACT: Team ${mostCompTeamId} gained 2 Budget; Team ${leastCompTeamId} lost 1 Innovation!`, 'gold');
+  broadcastGameState();
+}
 
 function hostEvaluateWinner() {
   let teamsArr = [];
@@ -1371,11 +1488,10 @@ function hostEvaluateWinner() {
 }
 
 /* =========================================================================
-   CLIENT ACTIONS & STRICT CRISIS VALIDATION (Requirement e)
+   CLIENT ACTIONS & MISSION FULFILLMENT
    ========================================================================= */
 
 function getTargetTeamId() {
-  // Requirement a: Facilitator operates on the currently spotlighted team
   return (isHost || isSolo) ? gameState.activeTurnTeamId : myTeamId;
 }
 
@@ -1393,8 +1509,35 @@ function clientSelectMission(missionKey) {
   clientSendAction({ type: 'SELECT_MISSION', teamId: targetId, missionKey: missionKey });
 }
 
-function clientSelectCard(index) {
-  selectedCardIndex = (selectedCardIndex === index) ? null : index;
+// Multi-select handling for Crisis 8, 10, 11
+function clientToggleHandCard(index) {
+  const isC8 = (gameState.activeCrisis && gameState.activeCrisis.id === 8);
+  const isC10 = (gameState.activeCrisis && gameState.activeCrisis.id === 10);
+  const isC11 = (gameState.activeCrisis && gameState.activeCrisis.id === 11);
+
+  if (isC8) {
+    // Up to 2 cards
+    if (selectedHandIndices.includes(index)) {
+      selectedHandIndices = selectedHandIndices.filter(i => i !== index);
+    } else {
+      if (selectedHandIndices.length < 2) selectedHandIndices.push(index);
+      else selectedHandIndices = [selectedHandIndices[1], index];
+    }
+  } else if (isC10) {
+    // Up to 2 cards for snipe
+    if (selectedHandIndices.includes(index)) selectedHandIndices = selectedHandIndices.filter(i => i !== index);
+    else if (selectedHandIndices.length < 2) selectedHandIndices.push(index);
+  } else if (isC11) {
+    // Variable cards for resignation
+    const targetId = getTargetTeamId();
+    const quota = gameState.teams[targetId].completedMissions.length + 1;
+    if (selectedHandIndices.includes(index)) selectedHandIndices = selectedHandIndices.filter(i => i !== index);
+    else if (selectedHandIndices.length < quota) selectedHandIndices.push(index);
+  } else {
+    // Standard single select
+    selectedHandIndices = (selectedHandIndices.includes(index)) ? [] : [index];
+  }
+
   renderHand();
   renderActiveMissionSlots();
   updateActionButtons();
@@ -1406,27 +1549,34 @@ function clientClickActiveSlot(slotIndex) {
     alert("It is not your team's turn yet!");
     return;
   }
-  if (selectedCardIndex === null) {
-    alert("Select a resource card from the hand first, then click this slot to fill it!");
-    return;
-  }
   const t = gameState.teams[targetId];
   if (t.actionTakenThisRound) {
     alert("This team has already taken an action this round!");
     return;
   }
   if (t.skipNextAction && gameState.phase === 'ACTION') {
-    alert("Action turn is skipped this round due to unfulfilled crisis!");
+    alert("Action turn is skipped this round due to crisis penalty!");
     return;
   }
 
-  const selectedCard = t.hand[selectedCardIndex];
+  const isC8 = (gameState.activeCrisis && gameState.activeCrisis.id === 8);
+  const requiredCount = isC8 ? 2 : 1;
+
+  if (selectedHandIndices.length !== requiredCount) {
+    alert(isC8 ? "Crisis 8 is active! You must select 2 MATCHING cards from your hand." : "Select a matching resource card from hand first.");
+    return;
+  }
+
   const mission = MISSION_SPECS[t.activeMissionKey];
   const allSlots = [...mission.slots, ...(t.scopeCreepAdded || [])];
   const requiredSlot = allSlots[slotIndex];
 
-  if (selectedCard !== requiredSlot) {
-    alert(`Card mismatch! This slot requires a ${requiredSlot} card.`);
+  // Validate cards
+  const cardTypes = selectedHandIndices.map(idx => t.hand[idx]);
+  const allMatch = cardTypes.every(c => c === requiredSlot);
+
+  if (!allMatch) {
+    alert(`Card mismatch! This slot requires ${requiredCount}x ${requiredSlot} card(s).`);
     return;
   }
 
@@ -1434,9 +1584,9 @@ function clientClickActiveSlot(slotIndex) {
     type: 'ACTION_FILL_ACTIVE_SLOT',
     teamId: targetId,
     slotIndex: slotIndex,
-    cardIndex: selectedCardIndex
+    cardIndices: [...selectedHandIndices]
   });
-  selectedCardIndex = null;
+  selectedHandIndices = [];
 }
 
 function clientDrawResources() {
@@ -1445,128 +1595,215 @@ function clientDrawResources() {
     alert("It is not your team's turn yet!");
     return;
   }
-  const t = gameState.teams[targetId];
-  if (t.skipNextAction && gameState.phase === 'ACTION') {
-    alert("Turn skipped due to crisis penalty!");
-    return;
-  }
   clientSendAction({ type: 'ACTION_DRAW', teamId: targetId });
 }
 
-function clientDiscardCard() {
-  if (gameState.phase !== 'CRISIS') {
-    alert("Discarding is only permitted during the Crisis Phase.");
-    return;
-  }
-  if (selectedCardIndex === null) return;
-  const targetId = getTargetTeamId();
-  clientSendAction({ type: 'ACTION_DISCARD', teamId: targetId, cardIndex: selectedCardIndex });
-  selectedCardIndex = null;
-}
+/* =========================================================================
+   STRICT CRISIS ACTIONS (NO GENERIC BUTTON CHEATING)
+   ========================================================================= */
 
-// STRICT CRISIS RESOLUTION WITH HAND CHECKS (Requirement e)
-function clientResolveCrisisAction(actionType) {
+function clientResolveCrisisAction(actionType, extraData = {}) {
   const targetId = getTargetTeamId();
-  if (targetId !== gameState.activeTurnTeamId && !isHost && !isSolo) {
-    alert("It is not your turn to resolve the crisis yet!");
-    return;
-  }
-  const t = gameState.teams[targetId];
   const crisis = gameState.activeCrisis;
   if (!crisis) return;
 
-  // Helper count cards
+  // Patent race is simultaneous for all teams
+  if (actionType !== 'crisis7_race' && targetId !== gameState.activeTurnTeamId && !isHost && !isSolo) {
+    alert("It is not your team's turn to resolve the crisis yet!");
+    return;
+  }
+
+  const t = gameState.teams[targetId];
   const countCard = (type) => t.hand.filter(c => c === type).length;
 
   switch(actionType) {
-    // Crisis 1: Discard 2 Budget
     case 'crisis1_discard': {
-      if (countCard('BUDGET') < 2) {
-        alert("Action Denied: You do not have 2 Budget cards in hand! You must choose 'Cannot Fulfil'.");
-        return;
-      }
+      if (countCard('BUDGET') < 2) return;
       clientSendAction({
-        type: 'CRISIS_FULFILLED',
-        teamId: targetId,
+        type: 'CRISIS_FULFILLED', teamId: targetId,
         detail: 'Discarded 2 Budget Cards',
         deductCards: ['BUDGET', 'BUDGET']
       });
       break;
     }
 
-    // Crisis 2: Discard 1 Budget + 1 Random card
     case 'crisis2_discard': {
-      if (countCard('BUDGET') < 1 || t.hand.length < 2) {
-        alert("Action Denied: You do not have 1 Budget card plus 1 other resource card in hand!");
-        return;
-      }
-      // Pick budget and one random other card
+      if (countCard('BUDGET') < 1 || t.hand.length < 2) return;
       const nonBudget = t.hand.find(c => c !== 'BUDGET') || 'BUDGET';
       clientSendAction({
-        type: 'CRISIS_FULFILLED',
-        teamId: targetId,
+        type: 'CRISIS_FULFILLED', teamId: targetId,
         detail: `Discarded 1 Budget + 1 ${nonBudget}`,
         deductCards: ['BUDGET', nonBudget]
       });
       break;
     }
 
-    // Crisis 4: Gain 2 Innovation OR Wipe Progress
     case 'crisis4_gain_inno': {
-      clientSendAction({ type: 'ACTION_DRAW', teamId: targetId });
-      clientSendAction({ type: 'CRISIS_FULFILLED', teamId: targetId, detail: 'Gained 2 Innovation cards' });
-      break;
-    }
-    case 'crisis4_wipe_progress': {
-      t.activeMissionFilledSlots = [];
-      clientSendAction({ type: 'CRISIS_FULFILLED', teamId: targetId, detail: 'Wiped current mission progress' });
+      clientSendAction({
+        type: 'CRISIS_FULFILLED', teamId: targetId,
+        action: 'crisis4_gain_inno',
+        detail: 'Gained 2 Innovation cards'
+      });
       break;
     }
 
-    // Crisis 5: Discard 1 Data
-    case 'crisis5_discard_data': {
-      if (countCard('DATA') < 1) {
-        alert("Action Denied: You do not have a Data card in hand!");
-        return;
-      }
+    case 'crisis4_wipe_progress': {
       clientSendAction({
-        type: 'CRISIS_FULFILLED',
-        teamId: targetId,
-        detail: 'Discarded 1 Data Card',
+        type: 'CRISIS_FULFILLED', teamId: targetId,
+        action: 'crisis4_wipe',
+        detail: 'Wiped current mission progress'
+      });
+      break;
+    }
+
+    case 'crisis5_remedy': {
+      if (countCard('COMPLIANCE') < 2 || countCard('BUDGET') < 1) return;
+      clientSendAction({
+        type: 'CRISIS_FULFILLED', teamId: targetId,
+        detail: 'Spent 2 Compliance + 1 Budget to remove Security Flaw',
+        deductCards: ['COMPLIANCE', 'COMPLIANCE', 'BUDGET']
+      });
+      break;
+    }
+
+    case 'crisis5_discard_data': {
+      if (countCard('DATA') < 1) return;
+      clientSendAction({
+        type: 'CRISIS_FULFILLED', teamId: targetId,
+        detail: 'Discarded 1 Data Card for Security Flaw',
         deductCards: ['DATA']
       });
       break;
     }
 
-    // Crisis 7: Patent Race (3 Inno + 1 Budget)
+    case 'crisis6_train': {
+      if (countCard('BUDGET') < 2) return;
+      clientSendAction({
+        type: 'CRISIS_FULFILLED', teamId: targetId,
+        action: 'crisis6_train',
+        detail: 'Trained team (Discarded 2 Budget for 2 Innovation)',
+        deductCards: ['BUDGET', 'BUDGET']
+      });
+      break;
+    }
+
+    case 'crisis6_hire': {
+      if (countCard('BUDGET') < 1 || countCard('DATA') < 1 || countCard('INNOVATION') < 1 || countCard('COMPLIANCE') < 1) return;
+      clientSendAction({
+        type: 'CRISIS_FULFILLED', teamId: targetId,
+        action: 'crisis6_hire',
+        detail: 'Hired externally (Discarded 1 of each card for 1 Progress Unit)',
+        deductCards: ['BUDGET', 'DATA', 'INNOVATION', 'COMPLIANCE']
+      });
+      break;
+    }
+
     case 'crisis7_race': {
-      if (countCard('INNOVATION') < 3 || countCard('BUDGET') < 1) {
-        alert("Action Denied: You need at least 3 Innovation and 1 Budget cards to win the Patent Race!");
+      if (gameState.patentRaceClaimed) {
+        alert("The Patent Race has already been claimed by another team!");
         return;
       }
-      // Gain 2 progress units + draw 2
-      if (t.activeMissionKey) {
-        const spec = MISSION_SPECS[t.activeMissionKey];
-        const allSlots = [...spec.slots, ...(t.scopeCreepAdded || [])];
-        for (let i = 0; i < allSlots.length && t.activeMissionFilledSlots.length < allSlots.length; i++) {
-          if (!t.activeMissionFilledSlots.includes(i)) {
-            t.activeMissionFilledSlots.push(i);
-            if (t.activeMissionFilledSlots.length >= 2) break;
-          }
-        }
+      if (countCard('INNOVATION') < 3 || countCard('BUDGET') < 1) {
+        alert("You do not have 3 Innovation + 1 Budget cards!");
+        return;
       }
-      clientSendAction({ type: 'ACTION_DRAW', teamId: targetId });
       clientSendAction({
-        type: 'CRISIS_FULFILLED',
-        teamId: targetId,
-        detail: 'Won Patent Race (+2 Progress Units, +2 Cards)',
+        type: 'CRISIS_FULFILLED', teamId: targetId,
+        action: 'crisis7_race',
+        detail: 'Claimed the Patent Race! (+2 Progress, +2 Cards)',
         deductCards: ['INNOVATION', 'INNOVATION', 'INNOVATION', 'BUDGET']
       });
       break;
     }
 
-    case 'generic_fulfill': {
-      clientSendAction({ type: 'CRISIS_FULFILLED', teamId: targetId, detail: 'Acknowledged crisis' });
+    case 'crisis9_remedy': {
+      if (countCard('INNOVATION') < 1 || countCard('BUDGET') < 1) return;
+      clientSendAction({
+        type: 'CRISIS_FULFILLED', teamId: targetId,
+        detail: 'Spent 1 Innovation + 1 Budget to cancel Market Disruption',
+        deductCards: ['INNOVATION', 'BUDGET']
+      });
+      break;
+    }
+
+    case 'crisis9_penalty': {
+      clientSendAction({
+        type: 'CRISIS_FULFILLED', teamId: targetId,
+        action: 'crisis9_penalty',
+        detail: 'Mission Value dropped by 2 points'
+      });
+      break;
+    }
+
+    case 'crisis10_swap': {
+      // extraData: myCards, theirCards
+      clientSendAction({
+        type: 'CRISIS_FULFILLED', teamId: targetId,
+        action: 'crisis10_swap',
+        detail: 'Resource Snipe swap executed',
+        myCards: extraData.myCards,
+        theirCards: extraData.theirCards
+      });
+      break;
+    }
+
+    case 'crisis11_discard': {
+      const selectedCards = selectedHandIndices.map(i => t.hand[i]);
+      clientSendAction({
+        type: 'CRISIS_FULFILLED', teamId: targetId,
+        detail: `Discarded ${selectedCards.length} cards for The Great Resignation`,
+        deductCards: selectedCards
+      });
+      selectedHandIndices = [];
+      break;
+    }
+
+    case 'crisis12_discard_compliance': {
+      if (countCard('COMPLIANCE') < 3) return;
+      clientSendAction({
+        type: 'CRISIS_FULFILLED', teamId: targetId,
+        detail: 'Discarded 3 Compliance cards for Regulatory Scrutiny',
+        deductCards: ['COMPLIANCE', 'COMPLIANCE', 'COMPLIANCE']
+      });
+      break;
+    }
+
+    case 'crisis12_draw_others': {
+      for (let i = 1; i <= 4; i++) {
+        if (i !== targetId) drawCardsForTeam(i, 2);
+      }
+      clientSendAction({
+        type: 'CRISIS_FULFILLED', teamId: targetId,
+        detail: 'Allowed all other teams to draw 2 resource cards'
+      });
+      break;
+    }
+
+    case 'crisis13_independent': {
+      clientSendAction({
+        type: 'CRISIS_FULFILLED', teamId: targetId,
+        detail: 'Remained independent'
+      });
+      break;
+    }
+
+    case 'crisis13_partner': {
+      clientSendAction({
+        type: 'CRISIS_FULFILLED', teamId: targetId,
+        action: 'crisis13_partner',
+        detail: 'Formed partnership (+2 Progress, all mission values -3 pts)'
+      });
+      break;
+    }
+
+    case 'crisis14_bid': {
+      const bidVal = parseInt(extraData.bid || 0);
+      clientSendAction({
+        type: 'CRISIS_FULFILLED', teamId: targetId,
+        action: 'crisis14_bid',
+        bid: bidVal,
+        detail: `Submitted secret bid`
+      });
       break;
     }
 
@@ -1586,7 +1823,7 @@ function renderUI() {
   phaseEl.innerText = gameState.phase + " PHASE";
   phaseEl.className = `phase-indicator ${gameState.phase === 'ACTION' ? 'phase-action' : 'phase-crisis'}`;
 
-  // Streamlined Facilitator Buttons (Requirement c)
+  // Controls for Facilitator
   const actBox = document.getElementById('phase-action-control-box');
   const criBox = document.getElementById('phase-crisis-control-box');
   if (gameState.phase === 'ACTION') {
@@ -1595,6 +1832,12 @@ function renderUI() {
   } else {
     actBox.style.display = 'none';
     criBox.style.display = 'block';
+
+    // Crisis 14 & 15 helper buttons
+    const btnC14 = document.getElementById('btn-host-c14-reveal');
+    const btnC15 = document.getElementById('btn-host-c15-exec');
+    btnC14.style.display = (gameState.activeCrisis && gameState.activeCrisis.id === 14) ? 'block' : 'none';
+    btnC15.style.display = (gameState.activeCrisis && gameState.activeCrisis.id === 15) ? 'block' : 'none';
   }
 
   // Decks
@@ -1623,7 +1866,6 @@ function renderUI() {
     }
   }
 
-  // Facilitator Turn highlight
   for (let id = 1; id <= 4; id++) {
     const btn = document.getElementById(`btn-turn-t${id}`);
     if (btn) btn.className = (id === gameState.activeTurnTeamId) ? 'btn-cyan' : '';
@@ -1635,13 +1877,13 @@ function renderUI() {
     winBanner.style.display = 'block';
     document.getElementById('winner-team-name').innerText = `TEAM ${gameState.winnerDeclared.id}: ${gameState.winnerDeclared.name}`;
     document.getElementById('winner-details').innerHTML = `
-      Final Score: <strong>${gameState.winnerDeclared.points} PTS</strong> | Completed Missions: <strong>${gameState.winnerDeclared.completed}/3</strong> | Remaining Cards: <strong>${gameState.winnerDeclared.hand}</strong> | Active Mission Progress: <strong>${gameState.winnerDeclared.progress} units</strong>
+      Final Score: <strong>${gameState.winnerDeclared.points} PTS</strong> | Completed Missions: <strong>${gameState.winnerDeclared.completed}/3</strong> | Remaining Cards: <strong>${gameState.winnerDeclared.hand}</strong> | Active Progress: <strong>${gameState.winnerDeclared.progress} units</strong>
     `;
   } else {
     winBanner.style.display = 'none';
   }
 
-  // Crisis Display (Requirement d: Hidden when not in Crisis phase)
+  // Crisis Display
   const crisisBox = document.getElementById('crisis-display');
   if (gameState.phase === 'CRISIS' && gameState.activeCrisis) {
     crisisBox.style.display = 'block';
@@ -1655,17 +1897,14 @@ function renderUI() {
   }
 
   const hostNextNum = document.getElementById('host-next-crisis-num');
-  if (hostNextNum) hostNextNum.innerText = gameState.currentCrisisIndex + 1;
+  if (hostNextNum) hostNextNum.innerText = (gameState.currentCrisisIndex % CRISIS_DECK.length) + 1;
 
-  // Requirement a: Facilitator view displays the toggled team!
   renderBoardroomView();
   renderAllTeamsGrid();
 }
 
-// STRICT CRISIS OPTIONS WITH HAND VERIFICATION (Requirement e)
 function renderCrisisInteractiveButtons() {
   const targetId = getTargetTeamId();
-  const isTargetTurn = (targetId === gameState.activeTurnTeamId);
   const t = gameState.teams[targetId];
   const btnContainer = document.getElementById('crisis-action-buttons');
   const note = document.getElementById('crisis-resolved-note');
@@ -1673,14 +1912,18 @@ function renderCrisisInteractiveButtons() {
   const header = document.getElementById('crisis-options-header');
   btnContainer.innerHTML = "";
 
-  if (t.crisisResolvedThisPhase) {
+  const crisisId = gameState.activeCrisis.id;
+  const isC7 = (crisisId === 7); // Simultaneous Patent Race
+
+  if (t.crisisResolvedThisPhase && !isC7) {
     note.style.display = 'block';
     waitNote.style.display = 'none';
     btnContainer.style.display = 'none';
     return;
   }
 
-  if (!isTargetTurn && !isHost && !isSolo) {
+  const isTargetTurn = (targetId === gameState.activeTurnTeamId);
+  if (!isTargetTurn && !isHost && !isSolo && !isC7) {
     note.style.display = 'none';
     waitNote.style.display = 'block';
     btnContainer.style.display = 'none';
@@ -1688,69 +1931,230 @@ function renderCrisisInteractiveButtons() {
     return;
   }
 
-  header.innerText = `TEAM ${targetId}'S CRISIS DECISION:`;
+  header.innerText = `TEAM ${targetId}'S CRISIS ACTION:`;
   note.style.display = 'none';
   waitNote.style.display = 'none';
   btnContainer.style.display = 'flex';
 
   const countCard = (type) => t.hand.filter(c => c === type).length;
-  const crisisId = gameState.activeCrisis.id;
 
+  // Crisis 1: Budget Cut
   if (crisisId === 1) {
     const has2B = countCard('BUDGET') >= 2;
     btnContainer.innerHTML = `
-      <button class="btn-cyan" ${!has2B ? 'disabled title="You do not have 2 Budget cards"' : ''} onclick="clientResolveCrisisAction('crisis1_discard')">
-        Discard 2 Budget Cards ${!has2B ? '(Missing)' : ''}
+      <button class="btn-cyan" ${!has2B ? 'disabled' : ''} onclick="clientResolveCrisisAction('crisis1_discard')">
+        Discard 2 Budget Cards ${!has2B ? '(Need 2 Budget)' : ''}
       </button>
       <button class="btn-red" onclick="clientResolveCrisisAction('cannot_fulfill')">
         Cannot Fulfil (Skip Next Action Turn)
       </button>
     `;
-  } else if (crisisId === 2) {
+  }
+  // Crisis 2: Tech Debt
+  else if (crisisId === 2) {
     const has1B1R = (countCard('BUDGET') >= 1 && t.hand.length >= 2);
     btnContainer.innerHTML = `
-      <button class="btn-cyan" ${!has1B1R ? 'disabled title="Requires 1 Budget + 1 extra card"' : ''} onclick="clientResolveCrisisAction('crisis2_discard')">
-        Discard 1 Budget + 1 Random Card ${!has1B1R ? '(Missing)' : ''}
+      <button class="btn-cyan" ${!has1B1R ? 'disabled' : ''} onclick="clientResolveCrisisAction('crisis2_discard')">
+        Discard 1 Budget + 1 Random Card ${!has1B1R ? '(Need 1 Budget + 1 Extra)' : ''}
       </button>
       <button class="btn-red" onclick="clientResolveCrisisAction('cannot_fulfill')">
         Cannot Fulfil (Skip Next Action Turn)
       </button>
     `;
-  } else if (crisisId === 4) {
+  }
+  // Crisis 3: Scope Creep
+  else if (crisisId === 3) {
+    btnContainer.innerHTML = `<span style="color:#34d399; font-weight:bold;">✓ Scope Creep automatically applied: +1 Data and +1 Budget requirement added to active mission.</span>`;
+  }
+  // Crisis 4: Innovation Trap
+  else if (crisisId === 4) {
     btnContainer.innerHTML = `
       <button class="btn-gold" onclick="clientResolveCrisisAction('crisis4_gain_inno')">Gain 2 Innovation Cards</button>
       <button class="btn-red" onclick="clientResolveCrisisAction('crisis4_wipe_progress')">Wipe Current Mission Progress</button>
       <button class="btn-cyan" onclick="clientResolveCrisisAction('cannot_fulfill')">Cannot Fulfil (Skip Next Turn)</button>
     `;
-  } else if (crisisId === 5) {
+  }
+  // Crisis 5: Slow Burn Security Flaw
+  else if (crisisId === 5) {
+    const hasRemedy = countCard('COMPLIANCE') >= 2 && countCard('BUDGET') >= 1;
     const hasData = countCard('DATA') >= 1;
     btnContainer.innerHTML = `
+      <button class="btn-green" ${!hasRemedy ? 'disabled' : ''} onclick="clientResolveCrisisAction('crisis5_remedy')">
+        Spend 2 Compliance + 1 Budget (Remove Flaw) ${!hasRemedy ? '(Missing Cards)' : ''}
+      </button>
       <button class="btn-cyan" ${!hasData ? 'disabled' : ''} onclick="clientResolveCrisisAction('crisis5_discard_data')">
-        Discard 1 Data Card ${!hasData ? '(Missing)' : ''}
+        Discard 1 Data Card ${!hasData ? '(Missing Data)' : ''}
       </button>
       <button class="btn-red" onclick="clientResolveCrisisAction('cannot_fulfill')">
-        Cannot Fulfil (Skip Next Turn)
+        Cannot Fulfil (Skip Next Action Turn)
       </button>
     `;
-  } else if (crisisId === 7) {
+  }
+  // Crisis 6: Digital Skill Gap
+  else if (crisisId === 6) {
+    const hasTrain = countCard('BUDGET') >= 2;
+    const hasHire = (countCard('BUDGET') >= 1 && countCard('DATA') >= 1 && countCard('INNOVATION') >= 1 && countCard('COMPLIANCE') >= 1);
+    btnContainer.innerHTML = `
+      <button class="btn-gold" ${!hasTrain ? 'disabled' : ''} onclick="clientResolveCrisisAction('crisis6_train')">
+        Train Team: Discard 2 Budget -> Gain 2 Innovation ${!hasTrain ? '(Need 2 Budget)' : ''}
+      </button>
+      <button class="btn-cyan" ${!hasHire ? 'disabled' : ''} onclick="clientResolveCrisisAction('crisis6_hire')">
+        Hire: Discard 1 of each card -> +1 Progress ${!hasHire ? '(Need 1 of each)' : ''}
+      </button>
+      <button class="btn-red" onclick="clientResolveCrisisAction('cannot_fulfill')">
+        Cannot Fulfil (Skip Next Action Turn)
+      </button>
+    `;
+  }
+  // Crisis 7: Patent Race (Simultaneous for all teams)
+  else if (crisisId === 7) {
     const hasRace = countCard('INNOVATION') >= 3 && countCard('BUDGET') >= 1;
+    if (gameState.patentRaceClaimed) {
+      btnContainer.innerHTML = `<span style="color:#ef4444; font-weight:bold;">The Patent Race has already been claimed!</span>`;
+    } else {
+      btnContainer.innerHTML = `
+        <button class="btn-gold" ${!hasRace ? 'disabled' : ''} onclick="clientResolveCrisisAction('crisis7_race')">
+          ⚡ CLAIM PATENT RACE: Discard 3 Innovation + 1 Budget (+2 Progress, Draw 2) ${!hasRace ? '(Need 3 Inno, 1 Budget)' : ''}
+        </button>
+      `;
+    }
+  }
+  // Crisis 8: Rule Reset
+  else if (crisisId === 8) {
+    btnContainer.innerHTML = `<span style="color:#38bdf8; font-weight:bold;">Rule Reset in effect for next Action Phase: 'Work on Mission' requires 2x resources; 'Draw' grants 3 cards.</span>`;
+  }
+  // Crisis 9: Market Disruption
+  else if (crisisId === 9) {
+    const hasRem = countCard('INNOVATION') >= 1 && countCard('BUDGET') >= 1;
     btnContainer.innerHTML = `
-      <button class="btn-gold" ${!hasRace ? 'disabled' : ''} onclick="clientResolveCrisisAction('crisis7_race')">
-        Discard 3 Innovation + 1 Budget ${!hasRace ? '(Need 3 Inno, 1 Budget)' : ''}
+      <button class="btn-green" ${!hasRem ? 'disabled' : ''} onclick="clientResolveCrisisAction('crisis9_remedy')">
+        Spend 1 Innovation + 1 Budget (Cancel Penalty) ${!hasRem ? '(Need 1 Inno, 1 Budget)' : ''}
       </button>
-      <button class="btn-cyan" onclick="clientResolveCrisisAction('generic_fulfill')">
-        Pass Patent Race
+      <button class="btn-gold" onclick="clientResolveCrisisAction('crisis9_penalty')">
+        Accept Market Disruption (-2 Mission Value Points)
+      </button>
+      <button class="btn-red" onclick="clientResolveCrisisAction('cannot_fulfill')">
+        Cannot Fulfil (Skip Next Action Turn)
       </button>
     `;
-  } else {
+  }
+  // Crisis 10: Resource Snipe
+  else if (crisisId === 10) {
+    const nextId = (targetId % 4) + 1;
+    const nextTeam = gameState.teams[nextId];
+    const mySelected = selectedHandIndices.map(i => t.hand[i]);
     btnContainer.innerHTML = `
-      <button class="btn-green" onclick="clientResolveCrisisAction('generic_fulfill')">Fulfil Crisis Requirements</button>
-      <button class="btn-red" onclick="clientResolveCrisisAction('cannot_fulfill')">Cannot Fulfil (Skip Next Action Turn)</button>
+      <div style="width: 100%; text-align: left; font-size: 0.85rem;">
+        <div>Select 2 cards from your hand below (Selected: ${mySelected.join(', ') || 'None'})</div>
+        <div style="margin-top: 6px;">Next Team (${nextTeam.name}) Hand: <strong>${nextTeam.hand.join(', ') || 'Empty'}</strong></div>
+      </div>
+      <button class="btn-cyan" ${mySelected.length !== 2 || nextTeam.hand.length < 2 ? 'disabled' : ''} onclick="promptCrisis10Swap(${targetId}, ${nextId})">
+        Execute 2-Card Swap with Team ${nextId}
+      </button>
     `;
+  }
+  // Crisis 11: The Great Resignation
+  else if (crisisId === 11) {
+    const quota = t.completedMissions.length + 1;
+    const mySelected = selectedHandIndices.map(i => t.hand[i]);
+    const canDiscard = (mySelected.length === quota);
+    btnContainer.innerHTML = `
+      <div style="width: 100%; text-align: left; font-size: 0.85rem; margin-bottom: 6px;">
+        Completed Missions: ${t.completedMissions.length} -> Must select and discard <strong>${quota}</strong> card(s). (Selected: ${mySelected.length}/${quota})
+      </div>
+      <button class="btn-red" ${!canDiscard ? 'disabled' : ''} onclick="clientResolveCrisisAction('crisis11_discard')">
+        Discard ${quota} Selected Card(s)
+      </button>
+    `;
+  }
+  // Crisis 12: Regulatory Scrutiny
+  else if (crisisId === 12) {
+    // Find highest progress team
+    let maxProg = -1;
+    let leaders = [];
+    for (let id = 1; id <= 4; id++) {
+      const tm = gameState.teams[id];
+      const prog = (tm.completedMissions.length * 10) + tm.activeMissionFilledSlots.length;
+      if (prog > maxProg) { maxProg = prog; leaders = [id]; }
+      else if (prog === maxProg) { leaders.push(id); }
+    }
+
+    if (leaders.includes(targetId)) {
+      const has3C = countCard('COMPLIANCE') >= 3;
+      btnContainer.innerHTML = `
+        <div style="width:100%; color:#ef4444; font-weight:bold; margin-bottom:4px;">🚨 Your team has the most progress!</div>
+        <button class="btn-cyan" ${!has3C ? 'disabled' : ''} onclick="clientResolveCrisisAction('crisis12_discard_compliance')">
+          Discard 3 Compliance Cards ${!has3C ? '(Need 3 Compliance)' : ''}
+        </button>
+        <button class="btn-gold" onclick="clientResolveCrisisAction('crisis12_draw_others')">
+          Cannot Discard: All Other Teams Draw 2 Cards
+        </button>
+      `;
+    } else {
+      btnContainer.innerHTML = `<span style="color:#34d399;">Your team is not under investigation. Waiting for leader's compliance resolution...</span>`;
+    }
+  }
+  // Crisis 13: Ecosystem Partnership
+  else if (crisisId === 13) {
+    btnContainer.innerHTML = `
+      <button class="btn-cyan" onclick="clientResolveCrisisAction('crisis13_independent')">
+        Remain Independent (No Effect)
+      </button>
+      <button class="btn-gold" onclick="clientResolveCrisisAction('crisis13_partner')">
+        Form Partnership (+2 Progress Units, All Mission Values -3 pts)
+      </button>
+    `;
+  }
+  // Crisis 14: The Bidding War
+  else if (crisisId === 14) {
+    const bCount = countCard('BUDGET');
+    const existingBid = gameState.crisis14Bids[targetId];
+    if (existingBid !== undefined) {
+      btnContainer.innerHTML = `<span style="color:#34d399; font-weight:bold;">✓ Secret bid submitted (${existingBid} Budget Cards). Waiting for Facilitator to reveal bids.</span>`;
+    } else {
+      btnContainer.innerHTML = `
+        <div style="width:100%; text-align:left; font-size:0.85rem; margin-bottom:6px;">
+          Budget cards available to bid: <strong>${bCount}</strong>
+        </div>
+        <input type="number" id="c14-bid-input" min="0" max="${bCount}" value="0" class="lobby-input" style="width:100px; margin:0 8px 0 0;" />
+        <button class="btn-gold" onclick="submitCrisis14Bid(${targetId}, ${bCount})">
+          Submit Secret Bid
+        </button>
+      `;
+    }
+  }
+  // Crisis 15: Digital Transparency Act
+  else if (crisisId === 15) {
+    btnContainer.innerHTML = `<span style="color:#38bdf8;">⚖️ Facilitator will evaluate total compliance and distribute rewards/penalties.</span>`;
   }
 }
 
-// Requirement a: Render Boardroom for whatever team is selected
+function promptCrisis10Swap(myId, theirId) {
+  const t = gameState.teams[myId];
+  const nextTeam = gameState.teams[theirId];
+  const myCards = selectedHandIndices.map(i => t.hand[i]);
+  if (myCards.length !== 2) return;
+
+  const pick1 = prompt(`Select 1st card to take from Team ${theirId} (${nextTeam.hand.join(', ')}):`);
+  const pick2 = prompt(`Select 2nd card to take from Team ${theirId} (${nextTeam.hand.join(', ')}):`);
+
+  if (!pick1 || !pick2) return;
+  clientResolveCrisisAction('crisis10_swap', {
+    myCards: myCards,
+    theirCards: [pick1.toUpperCase(), pick2.toUpperCase()]
+  });
+  selectedHandIndices = [];
+}
+
+function submitCrisis14Bid(teamId, maxB) {
+  const val = parseInt(document.getElementById('c14-bid-input').value || 0);
+  if (val < 0 || val > maxB) {
+    alert("Invalid bid amount!");
+    return;
+  }
+  clientResolveCrisisAction('crisis14_bid', { bid: val });
+}
+
 function renderBoardroomView() {
   const targetId = getTargetTeamId();
   const t = gameState.teams[targetId];
@@ -1803,15 +2207,22 @@ function renderBoardroomView() {
       }
     });
     if (btnBox.children.length === 0) {
-      btnBox.innerHTML = "<span style='color:#34d399; font-weight:bold;'>All 3 Missions Completed! You are a Galaxy Champion!</span>";
+      btnBox.innerHTML = "<span style='color:#34d399; font-weight:bold;'>All 3 Missions Completed!</span>";
     }
   } else {
     pickBox.style.display = 'none';
     activeBox.style.display = 'block';
 
     const mission = MISSION_SPECS[t.activeMissionKey];
+    const finalVal = Math.max(0, mission.value - (t.missionValuePenalty || 0));
     document.getElementById('active-mission-name').innerText = mission.name;
-    document.getElementById('active-mission-value-badge').innerText = `${mission.value} PTS`;
+    document.getElementById('active-mission-value-badge').innerText = `${finalVal} PTS ${t.missionValuePenalty ? `(-${t.missionValuePenalty})` : ''}`;
+
+    const isC8 = (gameState.activeCrisis && gameState.activeCrisis.id === 8);
+    document.getElementById('mission-work-instructions').innerHTML = isC8
+      ? `⚡ <strong>Rule Reset Active:</strong> Select <strong>2 MATCHING cards</strong> from hand, then click matching slot to fill 1 unit.`
+      : `Select a matching card from hand below, then click <strong>any open slot</strong> to fill it.`;
+
     renderActiveMissionSlots();
   }
 
@@ -1829,12 +2240,17 @@ function renderActiveMissionSlots() {
 
   const mission = MISSION_SPECS[t.activeMissionKey];
   const allSlots = [...mission.slots, ...(t.scopeCreepAdded || [])];
-  const selectedCard = (selectedCardIndex !== null) ? t.hand[selectedCardIndex] : null;
+  
+  const isC8 = (gameState.activeCrisis && gameState.activeCrisis.id === 8);
+  const selectedCards = selectedHandIndices.map(i => t.hand[i]);
+  const hasValidSelection = isC8 
+    ? (selectedCards.length === 2 && selectedCards[0] === selectedCards[1])
+    : (selectedCards.length === 1);
 
   allSlots.forEach((slotType, idx) => {
     const slotDiv = document.createElement('div');
     const isDone = t.activeMissionFilledSlots.includes(idx);
-    const isMatching = (!isDone && selectedCard && selectedCard === slotType);
+    const isMatching = (!isDone && hasValidSelection && selectedCards[0] === slotType);
 
     slotDiv.className = `slot ${slotType[0]} ${isDone ? 'completed' : ''} ${isMatching ? 'match-highlight' : ''}`;
     slotDiv.innerHTML = `<span>${slotType[0]}</span>`;
@@ -1855,8 +2271,9 @@ function renderHand() {
 
   t.hand.forEach((card, idx) => {
     const cardDiv = document.createElement('div');
-    cardDiv.className = `res-card ${card} ${selectedCardIndex === idx ? 'selected' : ''}`;
-    cardDiv.onclick = () => clientSelectCard(idx);
+    const isSel = selectedHandIndices.includes(idx);
+    cardDiv.className = `res-card ${card} ${isSel ? 'selected' : ''}`;
+    cardDiv.onclick = () => clientToggleHandCard(idx);
     cardDiv.innerHTML = `
       <div style="font-size:0.6rem; color:#94a3b8;">RESOURCE</div>
       <div style="font-size:0.8rem; font-weight:bold;">${card}</div>
@@ -1870,24 +2287,15 @@ function updateActionButtons() {
   const targetId = getTargetTeamId();
   const t = gameState.teams[targetId];
   const btnDraw = document.getElementById('btn-draw-resources');
-  const btnDiscardSingle = document.getElementById('btn-discard-card');
 
   const isTurn = (targetId === gameState.activeTurnTeamId) || isHost || isSolo;
   const isActionPhase = (gameState.phase === 'ACTION');
-  const isCrisisPhase = (gameState.phase === 'CRISIS');
+
+  const isC8 = (gameState.activeCrisis && gameState.activeCrisis.id === 8);
+  btnDraw.innerText = isC8 ? "Draw 3 Resource Cards (Rule Reset)" : "Draw 2 Resource Cards";
 
   const isDrawBlocked = !isActionPhase || !isTurn || t.actionTakenThisRound || t.skipNextAction;
   btnDraw.disabled = isDrawBlocked || (gameState.drawDeck.length === 0 && gameState.discardDeck.length === 0);
-
-  if (isCrisisPhase) {
-    btnDiscardSingle.disabled = (selectedCardIndex === null) || !isTurn;
-    btnDiscardSingle.title = "Discard selected card to resolve crisis penalty";
-    btnDiscardSingle.innerText = "Discard Selected Card (Crisis Penalty)";
-  } else {
-    btnDiscardSingle.disabled = true;
-    btnDiscardSingle.title = "Discarding is not permitted during Action Phase";
-    btnDiscardSingle.innerText = "Discard Selected Card (Crisis Only)";
-  }
 }
 
 function renderAllTeamsGrid() {
@@ -1900,7 +2308,6 @@ function renderAllTeamsGrid() {
     const isTurn = (id === gameState.activeTurnTeamId);
     card.className = `team-card ${id === myTeamId ? 'my-team' : ''}`;
     
-    // Clicking any team card on Facilitator view focuses that team!
     if (isHost) {
       card.style.cursor = 'pointer';
       card.onclick = () => hostSetTurn(id);
@@ -1914,13 +2321,14 @@ function renderAllTeamsGrid() {
       card.style.boxShadow = 'none';
     }
 
-    let missionInfo = `<span style="color:#94a3b8; font-style:italic;">Selecting next mission...</span>`;
+    let missionInfo = `<span style="color:#94a3b8; font-style:italic;">Selecting mission...</span>`;
     let slotsHtml = ``;
 
     if (t.activeMissionKey) {
       const spec = MISSION_SPECS[t.activeMissionKey];
       const allSlots = [...spec.slots, ...(t.scopeCreepAdded || [])];
-      missionInfo = `<strong style="color:var(--accent-cyan);">${spec.name}</strong> (${spec.value} pts)`;
+      const finalVal = Math.max(0, spec.value - (t.missionValuePenalty || 0));
+      missionInfo = `<strong style="color:var(--accent-cyan);">${spec.name}</strong> (${finalVal} pts)`;
 
       slotsHtml = `<div class="slots-container" style="margin-top:6px;">`;
       allSlots.forEach((slotType, idx) => {
@@ -1932,7 +2340,7 @@ function renderAllTeamsGrid() {
 
     const membersDisplay = (t.members && t.members.length > 0) 
       ? t.members.join(', ') 
-      : '<span style="color:#64748b; font-style:italic;">None joined yet</span>';
+      : '<span style="color:#64748b; font-style:italic;">None</span>';
 
     card.innerHTML = `
       <div style="display:flex; justify-content:space-between; align-items:center;">
