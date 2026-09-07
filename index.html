@@ -465,6 +465,14 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
         <div id="turn-spotlight-status" class="badge badge-budget" style="font-size: 0.85rem;">Awaiting Action</div>
       </div>
 
+      <!-- Rule Reset Alert Banner -->
+      <div id="c8-rule-reset-banner" style="display: none; background: linear-gradient(90deg, #1e3a8a, #0369a1); border: 2px solid var(--accent-cyan); border-radius: 10px; padding: 12px 18px; margin-bottom: 15px; color: #fff;">
+        <span class="badge" style="background:#0284c7; color:#fff; margin-bottom:4px;">RULE RESET ACTIVE</span>
+        <div style="font-size:0.95rem; font-weight:bold;">
+          Each team can choose to <strong>Draw 3 Resource Cards</strong> (instead of 2), OR <strong>complete 2 mission progress slots of the same type</strong> with just 1 resource!
+        </div>
+      </div>
+
       <!-- WINNER ANNOUNCEMENT BANNER -->
       <div id="winner-display" class="winner-banner" style="display: none;">
         <h2 style="font-size: 1.8rem; margin-bottom: 6px; color: #fef08a;">🏆 GALAXY GOVERNANCE CHAMPION: <span id="winner-team-name">TEAM 1</span></h2>
@@ -558,7 +566,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
         </div>
       </div>
 
-      <!-- All Teams Overview (Only Shows Created Teams with Joined Participants) -->
+      <!-- All Teams Overview -->
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <h3>Galaxy Boardroom: Active Teams</h3>
         <span id="active-teams-count-badge" class="badge badge-cyan" style="background:#1e293b; color:var(--accent-cyan);">0 Teams Joined</span>
@@ -590,6 +598,11 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
       <div id="host-controls-panel" class="host-panel" style="display: none;">
         <h4 style="color: var(--accent-gold); margin-bottom: 12px;">FACILITATOR CONTROLS</h4>
         
+        <!-- Button to dispense starting cards -->
+        <button id="btn-dispense-starting" class="btn-gold" style="width: 100%; margin-bottom: 12px;" onclick="hostDispenseStartingCards()">
+          🃏 Dispense Starting Cards (5 Cards)
+        </button>
+
         <div style="background: #090e17; padding: 10px; border-radius: 8px; border: 1px solid var(--accent-cyan); margin-bottom: 12px;">
           <span style="font-size: 0.8rem; color: #94a3b8; font-weight: bold;">TOGGLE ACTIVE TEAMS:</span>
           <div id="fac-team-toggle-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-top: 6px;">
@@ -641,9 +654,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
               <span style="font-size: 0.85rem; font-weight: bold; color: var(--accent-gold);">UNDO ACTIONS:</span>
               <span style="font-size: 0.75rem; color: #94a3b8;">Revert misclicks</span>
             </div>
-            <div id="undo-buttons-list">
-              <!-- Dynamically populated for created teams -->
-            </div>
+            <div id="undo-buttons-list"></div>
           </div>
 
           <div style="margin-top: 8px;">
@@ -704,18 +715,18 @@ const CRISIS_DECK = [
   { id: 1, name: "Budget Cut", flavor: "The CFO is cutting cost across all departments.", effect: "Discard 2 Budget Cards immediately." },
   { id: 2, name: "Tech Debt Comes Due", flavor: "Legacy systems are failing under heavy load.", effect: "Discard 1 Budget + 1 Random Resource Card." },
   { id: 3, name: "Scope Creep", flavor: "Stakeholders keep adding new requirements.", effect: "ACTIVE: 1 Data + 1 Budget resource requirement automatically added to your current mission.", action: "scope_creep" },
-  { id: 4, name: "Innovation Trap", flavor: "A shiny object technology promises to solve all problems.", effect: "Gain 2 Innovation Cards OR wipe all progress from your active mission." },
+  { id: 4, name: "Innovation Trap", flavor: "A shiny object technology promises to solve all problems.", effect: "Choose: Gain 2 Innovation Cards OR Gain 1 Mission Progress Unit." },
   { id: 5, name: "Slow Burn Security Flaw", flavor: "A minor security flaw discovered. Lasts TWO rounds.", effect: "Discard 1 Data Card, OR spend 2 Compliance + 1 Budget to eliminate the flaw completely." },
   { id: 6, name: "Digital Skill Gap", flavor: "Senior leadership lacks digital literacy.", effect: "Train (Discard 2 Budget for 2 Innovation) OR Hire (Discard 1 of each card for 1 Progress Unit)." },
   { id: 7, name: "The Patent Race", flavor: "Competitor is filing identical technology! First to file wins.", effect: "SIMULTANEOUS: First team to discard 3 Innovation + 1 Budget gains 2 progress units & draws 2 cards!" },
-  { id: 8, name: "Rule Reset", flavor: "A global black swan event reshapes the industry.", effect: "Work on Mission requires 2x matching resources. Draw Resources draws 3 cards." },
+  { id: 8, name: "Rule Reset", flavor: "A global black swan event reshapes the industry.", effect: "In the next Action Phase: Choose to Draw 3 Resource Cards (instead of 2), OR spend 1 Resource Card to complete 2 matching mission progress slots!" },
   { id: 9, name: "Market Disruption", flavor: "Competitor launch makes mission obsolete.", effect: "Spend 1 Innovation + 1 Budget to cancel, or current mission value drops by 2 points." },
   { id: 10, name: "Resource Snipe", flavor: "Critical component shortage creates seller's market.", effect: "Inspect the next active team's hand. Select 2 cards from your hand and swap with 2 of theirs." },
   { id: 11, name: "The Great Resignation", flavor: "Mid-level leadership has been poached.", effect: "Discard cards based on completed missions: 0 missions = 1 card, 1 mission = 2 cards, 2 missions = 3 cards." },
   { id: 12, name: "Regulatory Scrutiny", flavor: "Antitrust investigation underway for market leaders.", effect: "Team with the most progress must discard 3 Compliance Cards, or ALL other teams draw 2 cards." },
   { id: 13, name: "Ecosystem Partnership", flavor: "Platform giant offers strategic partnership.", effect: "Choose: Remain Independent OR Form Partnership (+2 progress units on active mission, but reduces all mission values by 3 pts)." },
-  { id: 14, name: "The Bidding War", flavor: "Top AI specialists are on the market.", effect: "Secretly bid Budget cards. Highest bidder discards bid and gains 3 progress units (no overspill)." },
-  { id: 15, name: "The Digital Transparency Act", flavor: "New algorithmic disclosure laws enacted.", effect: "Team with most compliance gains 2 Budget. Least compliant loses 1 Innovation (Facilitator evaluated)." }
+  { id: 14, name: "The Bidding War", flavor: "Top AI specialists are on the market.", effect: "SIMULTANEOUS: All active teams secretly bid Budget cards. Highest bidder discards bid and gains 3 progress units." },
+  { id: 15, name: "The Digital Transparency Act", flavor: "New algorithmic disclosure laws enacted.", effect: "Team with most compliance gains 2 Budget + 1 Progress Unit. Least compliant loses 1 Innovation (Facilitator evaluated)." }
 ];
 
 let isHost = false;
@@ -723,8 +734,8 @@ let isSolo = false;
 let mqttClient = null;
 let myTeamId = 1;
 let myPlayerName = "Board Member";
-let selectedHandIndices = []; // Cards chosen from own hand
-let selectedTargetHandIndices = []; // Cards chosen from target hand in Crisis 10
+let selectedHandIndices = [];
+let selectedTargetHandIndices = [];
 let teamActionHistory = { 1: [], 2: [], 3: [], 4: [] };
 
 let gameState = {
@@ -733,6 +744,9 @@ let gameState = {
   activeTurnTeamId: 1,
   currentCrisisIndex: 0,
   activeCrisis: null,
+  crisis8PendingNextAction: false,
+  crisis8RuleResetActive: false,
+  crisis14AllBidsSubmitted: false,
   drawDeck: [],
   discardDeck: [],
   winnerDeclared: null,
@@ -764,7 +778,6 @@ function createDefaultTeamState(name) {
   };
 }
 
-// DYNAMIC ACTIVE TEAMS: Created only when participants join
 function getActiveTeamIds() {
   if (isSolo) return [1, 2, 3, 4];
   const active = [];
@@ -806,7 +819,7 @@ function showFacilitatorToast(message, type = "info") {
   toast.className = `toast-msg ${type}`;
   toast.innerHTML = `<div style="font-size:0.75rem; color:#94a3b8; font-weight:bold;">NOTIFICATION</div><div>${message}</div>`;
   container.appendChild(toast);
-  playAlertBeep(type === 'alert');
+  playAlertBeep(type === 'alert' || type === 'gold');
 
   const logEl = document.getElementById('host-action-log');
   if (logEl) {
@@ -824,7 +837,7 @@ function showFacilitatorToast(message, type = "info") {
     toast.style.transform = 'translateX(100%)';
     toast.style.transition = 'all 0.3s';
     setTimeout(() => toast.remove(), 300);
-  }, 5000);
+  }, 5500);
 }
 
 function snapshotTeamState(teamId, actionDesc) {
@@ -907,10 +920,24 @@ function drawCardsForTeam(teamId, count) {
   }
 }
 
-function dealStartingCards() {
-  for (let teamId = 1; teamId <= 4; teamId++) {
-    drawCardsForTeam(teamId, 5);
+// Dispensary button for facilitator: Only dispense to active teams with joined members
+function hostDispenseStartingCards() {
+  if (!isHost) return;
+  const eligibleTeamIds = isSolo 
+    ? [1, 2, 3, 4] 
+    : [1, 2, 3, 4].filter(id => gameState.teams[id].members && gameState.teams[id].members.length > 0);
+
+  if (eligibleTeamIds.length === 0) {
+    alert("No active teams with joined members found! Wait for students to join.");
+    return;
   }
+
+  eligibleTeamIds.forEach(id => {
+    drawCardsForTeam(id, 5);
+  });
+
+  showFacilitatorToast(`🃏 Dispensed 5 starting resource cards to ${eligibleTeamIds.length} joined team(s)!`, 'gold');
+  broadcastGameState();
 }
 
 function connectMqtt(onConnectCb) {
@@ -943,7 +970,7 @@ function startHostGame() {
   gameState.roomCode = roomCode;
 
   initMainDeck();
-  dealStartingCards();
+  // DO NOT automatically deal starting cards; Facilitator dispenses via button when students arrive
   localStorage.setItem('galaxy_host_room', roomCode);
 
   document.getElementById('host-status').innerText = "Connecting to boardroom cloud...";
@@ -1067,6 +1094,46 @@ function broadcastGameState() {
   mqttClient.publish(topicState, JSON.stringify(gameState), { retain: true });
 }
 
+/* Centralized Mission Completion Check */
+function checkMissionCompletion(teamId) {
+  const t = gameState.teams[teamId];
+  if (!t || !t.activeMissionKey) return;
+  const mission = MISSION_SPECS[t.activeMissionKey];
+  const allSlots = [...mission.slots, ...(t.scopeCreepAdded || [])];
+
+  if (t.activeMissionFilledSlots.length >= allSlots.length) {
+    const finalVal = Math.max(0, mission.value - (t.missionValuePenalty || 0));
+    t.points += finalVal;
+    t.completedMissions.push(t.activeMissionKey);
+    showFacilitatorToast(`🏆 Team ${teamId} COMPLETED ${mission.name} (+${finalVal} PTS)! They must select their next mission board.`, 'gold');
+
+    // Reset active mission so the mission picker board immediately displays for the team
+    t.activeMissionKey = null;
+    t.activeMissionFilledSlots = [];
+    t.scopeCreepAdded = [];
+
+    if (t.completedMissions.length >= 3) {
+      hostEvaluateWinner();
+    }
+  }
+}
+
+function addProgressUnitsToTeam(teamId, count) {
+  const t = gameState.teams[teamId];
+  if (!t || !t.activeMissionKey) return;
+  const spec = MISSION_SPECS[t.activeMissionKey];
+  const allSlots = [...spec.slots, ...(t.scopeCreepAdded || [])];
+  for (let i = 0; i < allSlots.length; i++) {
+    if (!t.activeMissionFilledSlots.includes(i)) {
+      t.activeMissionFilledSlots.push(i);
+      count--;
+      if (count === 0) break;
+    }
+  }
+  // Immediately register mission completion and prompt for next board if completed
+  checkMissionCompletion(teamId);
+}
+
 /* =========================================================================
    HOST RECEIVE ACTIONS
    ========================================================================= */
@@ -1089,7 +1156,7 @@ function handleHostReceiveData(data) {
       snapshotTeamState(data.teamId, `Committed to Mission ${data.missionKey.toUpperCase()}`);
       t.activeMissionKey = data.missionKey;
       t.activeMissionFilledSlots = [];
-      showFacilitatorToast(`🚀 Team ${data.teamId} committed to ONE active mission: ${MISSION_SPECS[data.missionKey].name}`, 'info');
+      showFacilitatorToast(`🚀 Team ${data.teamId} committed to Mission: ${MISSION_SPECS[data.missionKey].name}`, 'info');
       broadcastGameState();
       break;
 
@@ -1108,22 +1175,25 @@ function handleHostReceiveData(data) {
           gameState.discardDeck.push(removed);
         });
 
-        t.activeMissionFilledSlots.push(slotIndex);
-        showFacilitatorToast(`🎯 Team ${data.teamId} played resources to fill ${requiredSlotType} on ${mission.name}!`, 'success');
-
-        if (t.activeMissionFilledSlots.length === allSlots.length) {
-          const finalVal = Math.max(0, mission.value - (t.missionValuePenalty || 0));
-          t.points += finalVal;
-          t.completedMissions.push(t.activeMissionKey);
-          showFacilitatorToast(`🏆 Team ${data.teamId} COMPLETED ${mission.name} (+${finalVal} PTS)!`, 'gold');
-          
-          t.activeMissionKey = null;
-          t.activeMissionFilledSlots = [];
-          t.scopeCreepAdded = [];
-
-          if (t.completedMissions.length >= 3) hostEvaluateWinner();
+        if (!t.activeMissionFilledSlots.includes(slotIndex)) {
+          t.activeMissionFilledSlots.push(slotIndex);
         }
 
+        // Crisis 8 Rule Reset Advantage: Spending 1 card completes 2 matching slots!
+        let extraFilled = false;
+        if (gameState.crisis8RuleResetActive) {
+          for (let i = 0; i < allSlots.length; i++) {
+            if (i !== slotIndex && allSlots[i] === requiredSlotType && !t.activeMissionFilledSlots.includes(i)) {
+              t.activeMissionFilledSlots.push(i);
+              extraFilled = true;
+              break;
+            }
+          }
+        }
+
+        showFacilitatorToast(`🎯 Team ${data.teamId} spent 1 ${requiredSlotType} and filled ${extraFilled ? '2' : '1'} slot(s) on ${mission.name}!`, 'success');
+
+        checkMissionCompletion(data.teamId);
         t.actionTakenThisRound = true;
         broadcastGameState();
       }
@@ -1131,10 +1201,11 @@ function handleHostReceiveData(data) {
 
     case 'ACTION_DRAW':
       snapshotTeamState(data.teamId, 'Drew Resource Cards');
-      const drawQty = (gameState.activeCrisis && gameState.activeCrisis.id === 8) ? 3 : 2;
+      // Crisis 8 Rule Reset Advantage: Draw 3 cards instead of 2
+      const drawQty = gameState.crisis8RuleResetActive ? 3 : 2;
       drawCardsForTeam(data.teamId, drawQty);
       t.actionTakenThisRound = true;
-      showFacilitatorToast(`📦 Team ${data.teamId} drew ${drawQty} Resource Cards`);
+      showFacilitatorToast(`📦 Team ${data.teamId} drew ${drawQty} Resource Cards${gameState.crisis8RuleResetActive ? ' (Rule Reset Advantage)' : ''}`);
       broadcastGameState();
       break;
 
@@ -1152,9 +1223,9 @@ function handleHostReceiveData(data) {
         });
       }
 
-      // Crisis 4: Wipe Progress completely
-      if (data.action === 'crisis4_wipe') {
-        t.activeMissionFilledSlots = [];
+      // Crisis 4: Gain 1 Mission Progress Unit
+      if (data.action === 'crisis4_gain_progress') {
+        addProgressUnitsToTeam(data.teamId, 1);
       }
       // Crisis 4: Gain 2 Innovation Cards Strictly
       if (data.action === 'crisis4_gain_inno') {
@@ -1175,7 +1246,7 @@ function handleHostReceiveData(data) {
       if (data.action === 'crisis6_hire') {
         addProgressUnitsToTeam(data.teamId, 1);
       }
-      // Crisis 6 Train: Gain 2 Innovation Cards Strictly
+      // Crisis 6 Train
       if (data.action === 'crisis6_train') {
         for (let i = 0; i < 2; i++) {
           const innoIdx = gameState.drawDeck.indexOf('INNOVATION');
@@ -1203,7 +1274,7 @@ function handleHostReceiveData(data) {
         t.missionValuePenalty = (t.missionValuePenalty || 0) + 2;
       }
 
-      // Crisis 10: Forced 2-Card Swap between Active Teams
+      // Crisis 10: Forced 2-Card Swap
       if (data.action === 'crisis10_swap') {
         const targetTeam = gameState.teams[data.targetTeamId];
         data.myCards.forEach(c => {
@@ -1225,10 +1296,18 @@ function handleHostReceiveData(data) {
         t.missionValuePenalty = (t.missionValuePenalty || 0) + 3;
       }
 
-      // Crisis 14 submit secret bid
+      // Crisis 14 submit secret bid (Simultaneous)
       if (data.action === 'crisis14_bid') {
         gameState.crisis14Bids[data.teamId] = data.bid;
         showFacilitatorToast(`🔒 Team ${data.teamId} submitted secret bid.`);
+
+        // Prompt when all active teams have submitted their bids
+        const activeIds = getActiveTeamIds();
+        const allBidsIn = activeIds.length > 0 && activeIds.every(id => gameState.crisis14Bids[id] !== undefined);
+        if (allBidsIn) {
+          gameState.crisis14AllBidsSubmitted = true;
+          showFacilitatorToast(`🔔 ALL ${activeIds.length} ACTIVE TEAMS SUBMITTED BIDS! Facilitator can reveal bids.`, 'gold');
+        }
       }
 
       showFacilitatorToast(`✅ Team ${data.teamId} resolved Crisis: ${data.detail}`, 'success');
@@ -1245,26 +1324,12 @@ function handleHostReceiveData(data) {
   }
 }
 
-function addProgressUnitsToTeam(teamId, count) {
-  const t = gameState.teams[teamId];
-  if (!t || !t.activeMissionKey) return;
-  const spec = MISSION_SPECS[t.activeMissionKey];
-  const allSlots = [...spec.slots, ...(t.scopeCreepAdded || [])];
-  for (let i = 0; i < allSlots.length; i++) {
-    if (!t.activeMissionFilledSlots.includes(i)) {
-      t.activeMissionFilledSlots.push(i);
-      count--;
-      if (count === 0) break;
-    }
-  }
-}
-
 function startSoloTest() {
   isHost = true;
   isSolo = true;
   gameState.roomCode = "SOLO";
   initMainDeck();
-  dealStartingCards();
+  // In solo sandbox mode, facilitator can also dispense cards via button
 
   document.getElementById('view-lobby').style.display = 'none';
   document.getElementById('view-game').style.display = 'block';
@@ -1322,11 +1387,18 @@ function hostTriggerNextCrisis() {
   gameState.activeCrisis = crisis;
   gameState.currentCrisisIndex++;
   gameState.phase = 'CRISIS';
+  gameState.crisis8RuleResetActive = false; // Ends any previous rule reset
+
+  // Track if this crisis is Rule Reset to activate next action round
+  if (crisis.id === 8) {
+    gameState.crisis8PendingNextAction = true;
+  }
   
   const activeIds = getActiveTeamIds();
   gameState.activeTurnTeamId = activeIds[0];
   gameState.patentRaceClaimed = false;
   gameState.crisis14Bids = {};
+  gameState.crisis14AllBidsSubmitted = false;
   selectedHandIndices = [];
   selectedTargetHandIndices = [];
 
@@ -1352,6 +1424,15 @@ function hostConcludeCrisisAndStartAction() {
   if (!isHost) return;
   gameState.phase = 'ACTION';
   gameState.activeCrisis = null;
+
+  // Check if Crisis 8 activates for this upcoming action phase
+  if (gameState.crisis8PendingNextAction) {
+    gameState.crisis8RuleResetActive = true;
+    gameState.crisis8PendingNextAction = false;
+    showFacilitatorToast(`⚡ RULE RESET ACTIVE FOR THIS ACTION PHASE: Draw 3 cards OR fill 2 matching slots with 1 resource!`, 'gold');
+  } else {
+    gameState.crisis8RuleResetActive = false;
+  }
   
   const activeIds = getActiveTeamIds();
   gameState.activeTurnTeamId = activeIds[0];
@@ -1453,6 +1534,7 @@ function hostResolveCrisis14Bids() {
         gameState.discardDeck.push(removed);
       }
     }
+    // Award 3 progress units & check mission completion
     addProgressUnitsToTeam(winnerTeamId, 3);
     showFacilitatorToast(`🏆 TEAM ${winnerTeamId} WON BIDDING WAR with ${maxBid} Budget Cards! (+3 Progress Units)`, 'gold');
   } else {
@@ -1479,8 +1561,11 @@ function hostExecuteCrisis15() {
   const mostCompTeamId = counts[0].id;
   const leastCompTeamId = counts[counts.length - 1].id;
 
+  // Reward most compliant with 2 Budget + 1 Progress Unit
   gameState.teams[mostCompTeamId].hand.push('BUDGET', 'BUDGET');
+  addProgressUnitsToTeam(mostCompTeamId, 1);
 
+  // Least compliant loses 1 Innovation
   const innoIdx = gameState.teams[leastCompTeamId].hand.indexOf('INNOVATION');
   if (innoIdx > -1) {
     const rm = gameState.teams[leastCompTeamId].hand.splice(innoIdx, 1)[0];
@@ -1489,7 +1574,7 @@ function hostExecuteCrisis15() {
 
   for (let id in gameState.teams) gameState.teams[id].crisisResolvedThisPhase = true;
 
-  showFacilitatorToast(`⚖️ DIGITAL TRANSPARENCY ACT: Team ${mostCompTeamId} gained 2 Budget; Team ${leastCompTeamId} lost 1 Innovation!`, 'gold');
+  showFacilitatorToast(`⚖️ DIGITAL TRANSPARENCY ACT: Team ${mostCompTeamId} gained 2 Budget + 1 Progress; Team ${leastCompTeamId} lost 1 Innovation!`, 'gold');
   broadcastGameState();
 }
 
@@ -1559,12 +1644,10 @@ function clientSelectMission(missionKey) {
 }
 
 function clientToggleHandCard(index) {
-  const isC8 = (gameState.activeCrisis && gameState.activeCrisis.id === 8);
   const isC10 = (gameState.activeCrisis && gameState.activeCrisis.id === 10);
   const isC11 = (gameState.activeCrisis && gameState.activeCrisis.id === 11);
 
-  if (isC8 || isC10) {
-    // Up to 2 cards
+  if (isC10) {
     if (selectedHandIndices.includes(index)) {
       selectedHandIndices = selectedHandIndices.filter(i => i !== index);
     } else {
@@ -1577,13 +1660,13 @@ function clientToggleHandCard(index) {
     if (selectedHandIndices.includes(index)) selectedHandIndices = selectedHandIndices.filter(i => i !== index);
     else if (selectedHandIndices.length < quota) selectedHandIndices.push(index);
   } else {
+    // Normal mission play (1 card is selected at a time)
     selectedHandIndices = (selectedHandIndices.includes(index)) ? [] : [index];
   }
 
   renderHand();
   renderActiveMissionSlots();
   updateActionButtons();
-  // Ensure dashboard reactively updates selected chips in Crisis 10 & 11!
   renderCrisisInteractiveButtons();
 }
 
@@ -1613,23 +1696,18 @@ function clientClickActiveSlot(slotIndex) {
     return;
   }
 
-  const isC8 = (gameState.activeCrisis && gameState.activeCrisis.id === 8);
-  const requiredCount = isC8 ? 2 : 1;
-
-  if (selectedHandIndices.length !== requiredCount) {
-    alert(isC8 ? "Crisis 8 is active! Select 2 MATCHING cards from hand." : "Select a matching resource card from hand first.");
+  if (selectedHandIndices.length !== 1) {
+    alert("Select 1 matching resource card from your hand first.");
     return;
   }
 
   const mission = MISSION_SPECS[t.activeMissionKey];
   const allSlots = [...mission.slots, ...(t.scopeCreepAdded || [])];
   const requiredSlot = allSlots[slotIndex];
+  const selectedCardType = t.hand[selectedHandIndices[0]];
 
-  const cardTypes = selectedHandIndices.map(idx => t.hand[idx]);
-  const allMatch = cardTypes.every(c => c === requiredSlot);
-
-  if (!allMatch) {
-    alert(`Card mismatch! This slot requires ${requiredCount}x ${requiredSlot} card(s).`);
+  if (selectedCardType !== requiredSlot) {
+    alert(`Card mismatch! This slot requires a ${requiredSlot} card.`);
     return;
   }
 
@@ -1660,7 +1738,9 @@ function clientResolveCrisisAction(actionType, extraData = {}) {
   const crisis = gameState.activeCrisis;
   if (!crisis) return;
 
-  if (actionType !== 'crisis7_race' && targetId !== gameState.activeTurnTeamId && !isHost && !isSolo) {
+  // Simultaneous events (Race or Bidding War) do not require activeTurnTeamId
+  const isSimultaneous = (actionType === 'crisis7_race' || actionType === 'crisis14_bid');
+  if (!isSimultaneous && targetId !== gameState.activeTurnTeamId && !isHost && !isSolo) {
     alert("It is not your team's turn to resolve the crisis yet!");
     return;
   }
@@ -1694,19 +1774,16 @@ function clientResolveCrisisAction(actionType, extraData = {}) {
       clientSendAction({
         type: 'CRISIS_FULFILLED', teamId: targetId,
         action: 'crisis4_gain_inno',
-        detail: 'Gained 2 Innovation Cards strictly'
+        detail: 'Gained 2 Innovation Cards'
       });
       break;
     }
 
-    case 'crisis4_wipe_progress': {
-      t.activeMissionFilledSlots = [];
-      renderBoardroomView();
-      renderAllTeamsGrid();
+    case 'crisis4_gain_progress': {
       clientSendAction({
         type: 'CRISIS_FULFILLED', teamId: targetId,
-        action: 'crisis4_wipe',
-        detail: 'Wiped current mission progress (Tracker uncrossed)'
+        action: 'crisis4_gain_progress',
+        detail: 'Gained 1 Mission Progress Unit'
       });
       break;
     }
@@ -1767,6 +1844,14 @@ function clientResolveCrisisAction(actionType, extraData = {}) {
         action: 'crisis7_race',
         detail: 'Claimed the Patent Race! (+2 Progress, +2 Cards)',
         deductCards: ['INNOVATION', 'INNOVATION', 'INNOVATION', 'BUDGET']
+      });
+      break;
+    }
+
+    case 'crisis8_ack': {
+      clientSendAction({
+        type: 'CRISIS_FULFILLED', teamId: targetId,
+        detail: 'Acknowledged Rule Reset'
       });
       break;
     }
@@ -1856,7 +1941,7 @@ function clientResolveCrisisAction(actionType, extraData = {}) {
     case 'crisis14_bid': {
       const bidVal = parseInt(extraData.bid || 0);
       clientSendAction({
-        type: 'CRISIS_FULFILLED', teamId: targetId,
+        type: 'CRISIS_FULFILLED', teamId: extraData.teamId || targetId,
         action: 'crisis14_bid',
         bid: bidVal,
         detail: `Submitted secret bid`
@@ -1880,6 +1965,14 @@ function renderUI() {
   phaseEl.innerText = gameState.phase + " PHASE";
   phaseEl.className = `phase-indicator ${gameState.phase === 'ACTION' ? 'phase-action' : 'phase-crisis'}`;
 
+  // Crisis 8 Rule Reset Active Banner
+  const c8Banner = document.getElementById('c8-rule-reset-banner');
+  if (gameState.phase === 'ACTION' && gameState.crisis8RuleResetActive) {
+    c8Banner.style.display = 'block';
+  } else {
+    c8Banner.style.display = 'none';
+  }
+
   const actBox = document.getElementById('phase-action-control-box');
   const criBox = document.getElementById('phase-crisis-control-box');
   if (gameState.phase === 'ACTION') {
@@ -1893,6 +1986,19 @@ function renderUI() {
     const btnC15 = document.getElementById('btn-host-c15-exec');
     btnC14.style.display = (gameState.activeCrisis && gameState.activeCrisis.id === 14) ? 'block' : 'none';
     btnC15.style.display = (gameState.activeCrisis && gameState.activeCrisis.id === 15) ? 'block' : 'none';
+
+    // Highlight C14 button if all bids are submitted
+    if (gameState.activeCrisis && gameState.activeCrisis.id === 14) {
+      if (gameState.crisis14AllBidsSubmitted) {
+        btnC14.className = 'btn-gold';
+        btnC14.style.boxShadow = '0 0 16px #f59e0b';
+        btnC14.innerText = '💰 All Bids Submitted! Reveal & Award AI Specialists';
+      } else {
+        btnC14.className = 'btn-cyan';
+        btnC14.style.boxShadow = 'none';
+        btnC14.innerText = '💰 Reveal Bids & Award AI Specialists';
+      }
+    }
   }
 
   document.getElementById('deck-draw-count').innerText = gameState.drawDeck.length;
@@ -1920,7 +2026,7 @@ function renderUI() {
     }
   }
 
-  // Update Facilitator toggle buttons (highlight active turn)
+  // Update Facilitator toggle buttons
   for (let id = 1; id <= 4; id++) {
     const btn = document.getElementById(`btn-turn-t${id}`);
     if (btn) btn.className = (id === gameState.activeTurnTeamId) ? 'btn-cyan' : '';
@@ -1981,9 +2087,9 @@ function renderCrisisInteractiveButtons() {
   btnContainer.innerHTML = "";
 
   const crisisId = gameState.activeCrisis.id;
-  const isC7 = (crisisId === 7);
+  const isSimultaneous = (crisisId === 7 || crisisId === 14);
 
-  // Crisis 3: Grey out input by team
+  // Crisis 3: Auto applied
   if (crisisId === 3) {
     header.innerText = `CRISIS 3 (SCOPE CREEP) ACTIVE:`;
     note.style.display = 'none';
@@ -1994,13 +2100,41 @@ function renderCrisisInteractiveButtons() {
         Stakeholders keep adding new requirements: <strong>+1 Data and +1 Budget</strong> requirement have been automatically added to your active mission.
       </div>
       <button class="btn-cyan" disabled style="opacity:0.4; pointer-events:none; cursor:not-allowed;">
-        No Input Required (Auto-Applied to Mission Board)
+        Auto-Applied to Mission Boards
       </button>
     `;
     return;
   }
 
-  if (t.crisisResolvedThisPhase && !isC7) {
+  // Crisis 14 Facilitator Dashboard (DO NOT SHOW AVAILABLE BUDGET CARDS)
+  if (crisisId === 14 && isHost) {
+    header.innerText = `CRISIS 14: THE BIDDING WAR (SIMULTANEOUS BIDDING)`;
+    note.style.display = 'none';
+    waitNote.style.display = 'none';
+    btnContainer.style.display = 'block';
+
+    const activeIds = getActiveTeamIds();
+    let statusLines = activeIds.map(id => {
+      const hasBid = (gameState.crisis14Bids[id] !== undefined);
+      return `<div style="font-size:0.85rem; margin-bottom:3px;">Team ${id} (${gameState.teams[id].name}): ${hasBid ? '<span style="color:#34d399; font-weight:bold;">Secret Bid Submitted ✓</span>' : '<span style="color:#f59e0b; font-style:italic;">Submitting bid...</span>'}</div>`;
+    }).join('');
+
+    const bidsSubmittedCount = Object.keys(gameState.crisis14Bids).length;
+    btnContainer.innerHTML = `
+      <div style="width:100%; text-align:left; margin-bottom:10px;">
+        <p style="color:#fca5a5; font-size:0.9rem; margin-bottom:6px;">
+          All active teams are secretly submitting bids from their devices right now.
+        </p>
+        <div style="font-size:0.9rem; font-weight:bold; color:var(--accent-gold); margin-bottom:8px;">
+          Bids Submitted: ${bidsSubmittedCount} / ${activeIds.length} Teams
+        </div>
+        ${statusLines}
+      </div>
+    `;
+    return;
+  }
+
+  if (t.crisisResolvedThisPhase && !isSimultaneous) {
     note.style.display = 'block';
     waitNote.style.display = 'none';
     btnContainer.style.display = 'none';
@@ -2008,7 +2142,7 @@ function renderCrisisInteractiveButtons() {
   }
 
   const isTargetTurn = (targetId === gameState.activeTurnTeamId);
-  if (!isTargetTurn && !isHost && !isSolo && !isC7) {
+  if (!isTargetTurn && !isHost && !isSolo && !isSimultaneous) {
     note.style.display = 'none';
     waitNote.style.display = 'block';
     btnContainer.style.display = 'none';
@@ -2045,16 +2179,16 @@ function renderCrisisInteractiveButtons() {
       </button>
     `;
   }
-  // Crisis 4: Gain 2 Innovation Cards Strictly OR Wipe Current Mission Progress
+  // Crisis 4: Gain 2 Innovation Cards OR Gain 1 Mission Progress Unit
   else if (crisisId === 4) {
     btnContainer.innerHTML = `
       <button class="btn-gold" onclick="clientResolveCrisisAction('crisis4_gain_inno')">
-        Gain 2 Innovation Cards Strictly
+        Gain 2 Innovation Cards
       </button>
-      <button class="btn-red" onclick="clientResolveCrisisAction('crisis4_wipe_progress')">
-        Wipe Current Mission Progress (Uncross Tracker)
+      <button class="btn-green" onclick="clientResolveCrisisAction('crisis4_gain_progress')">
+        Gain 1 Mission Progress Unit
       </button>
-      <button class="btn-cyan" onclick="clientResolveCrisisAction('cannot_fulfill')">
+      <button class="btn-red" onclick="clientResolveCrisisAction('cannot_fulfill')">
         Cannot Fulfil (Skip Next Action Turn)
       </button>
     `;
@@ -2074,7 +2208,6 @@ function renderCrisisInteractiveButtons() {
       </button>
     `;
   }
-  // Crisis 6: 3 explicit buttons
   else if (crisisId === 6) {
     const has2B = countCard('BUDGET') >= 2;
     const has1OfEach = (countCard('BUDGET') >= 1 && countCard('DATA') >= 1 && countCard('INNOVATION') >= 1 && countCard('COMPLIANCE') >= 1);
@@ -2102,8 +2235,14 @@ function renderCrisisInteractiveButtons() {
       `;
     }
   }
+  // Crisis 8: Rule Reset
   else if (crisisId === 8) {
-    btnContainer.innerHTML = `<span style="color:#38bdf8; font-weight:bold;">Rule Reset in effect for next Action Phase: 'Work on Mission' requires 2x resources; 'Draw' grants 3 cards.</span>`;
+    btnContainer.innerHTML = `
+      <div style="width:100%; color:#38bdf8; font-weight:bold; margin-bottom:8px;">
+        Rule Reset takes effect in the next Action Phase: Choose to Draw 3 cards, OR spend 1 resource card to complete 2 matching mission progress units!
+      </div>
+      <button class="btn-cyan" onclick="clientResolveCrisisAction('crisis8_ack')">Acknowledge Rule Reset</button>
+    `;
   }
   else if (crisisId === 9) {
     const hasRem = countCard('INNOVATION') >= 1 && countCard('BUDGET') >= 1;
@@ -2119,7 +2258,6 @@ function renderCrisisInteractiveButtons() {
       </button>
     `;
   }
-  // Crisis 10: Interactive Forced 2-for-2 Swap with Next Active Team
   else if (crisisId === 10) {
     const nextId = getNextActiveTeamId(targetId);
     if (!nextId) {
@@ -2164,7 +2302,6 @@ function renderCrisisInteractiveButtons() {
       </button>
     `;
   }
-  // Crisis 11: The Great Resignation (Reactivity Fixed)
   else if (crisisId === 11) {
     const quota = t.completedMissions.length + 1;
     const mySelected = selectedHandIndices.map(i => t.hand[i]);
@@ -2217,20 +2354,24 @@ function renderCrisisInteractiveButtons() {
       </button>
     `;
   }
+  // Crisis 14: Simultaneous Secret Bidding for Active Teams
   else if (crisisId === 14) {
     const bCount = countCard('BUDGET');
     const existingBid = gameState.crisis14Bids[targetId];
+
     if (existingBid !== undefined) {
-      btnContainer.innerHTML = `<span style="color:#34d399; font-weight:bold;">✓ Secret bid submitted (${existingBid} Budget Cards). Waiting for Facilitator to reveal bids.</span>`;
+      btnContainer.innerHTML = `<span style="color:#34d399; font-weight:bold;">✓ Secret bid submitted (${existingBid} Budget Cards). Awaiting Facilitator reveal.</span>`;
     } else {
       btnContainer.innerHTML = `
         <div style="width:100%; text-align:left; font-size:0.85rem; margin-bottom:6px;">
-          Budget cards available to bid: <strong>${bCount}</strong>
+          Budget cards available in your hand to bid: <strong>${bCount}</strong>
         </div>
-        <input type="number" id="c14-bid-input" min="0" max="${bCount}" value="0" class="lobby-input" style="width:100px; margin:0 8px 0 0;" />
-        <button class="btn-gold" onclick="submitCrisis14Bid(${targetId}, ${bCount})">
-          Submit Secret Bid
-        </button>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <input type="number" id="c14-bid-input" min="0" max="${bCount}" value="0" class="lobby-input" style="width:90px; margin:0;" />
+          <button class="btn-gold" onclick="submitCrisis14Bid(${targetId}, ${bCount})">
+            Submit Secret Bid
+          </button>
+        </div>
       `;
     }
   }
@@ -2258,12 +2399,13 @@ function executeCrisis10Swap(myId, targetId) {
 }
 
 function submitCrisis14Bid(teamId, maxB) {
-  const val = parseInt(document.getElementById('c14-bid-input').value || 0);
-  if (val < 0 || val > maxB) {
-    alert("Invalid bid amount!");
+  const inputEl = document.getElementById('c14-bid-input');
+  const val = parseInt(inputEl ? inputEl.value : 0);
+  if (isNaN(val) || val < 0 || val > maxB) {
+    alert(`Invalid bid amount! Enter a value between 0 and ${maxB}.`);
     return;
   }
-  clientResolveCrisisAction('crisis14_bid', { bid: val });
+  clientResolveCrisisAction('crisis14_bid', { teamId: teamId, bid: val });
 }
 
 function renderBoardroomView() {
@@ -2300,6 +2442,7 @@ function renderBoardroomView() {
   const pickBox = document.getElementById('mission-select-container');
   const activeBox = document.getElementById('active-mission-container');
 
+  // If no mission is active, show the mission selection cards
   if (!t.activeMissionKey) {
     pickBox.style.display = 'block';
     activeBox.style.display = 'none';
@@ -2328,9 +2471,8 @@ function renderBoardroomView() {
     document.getElementById('active-mission-name').innerText = mission.name;
     document.getElementById('active-mission-value-badge').innerText = `${finalVal} PTS ${t.missionValuePenalty ? `(-${t.missionValuePenalty})` : ''}`;
 
-    const isC8 = (gameState.activeCrisis && gameState.activeCrisis.id === 8);
-    document.getElementById('mission-work-instructions').innerHTML = isC8
-      ? `⚡ <strong>Rule Reset Active:</strong> Select <strong>2 MATCHING cards</strong> from hand, then click matching slot to fill 1 unit.`
+    document.getElementById('mission-work-instructions').innerHTML = gameState.crisis8RuleResetActive
+      ? `⚡ <strong>Rule Reset Active:</strong> Spend 1 resource card to complete <strong>2 matching progress slots</strong>!`
       : `Select a matching card from hand below, then click <strong>any open slot</strong> to fill it.`;
 
     renderActiveMissionSlots();
@@ -2351,11 +2493,8 @@ function renderActiveMissionSlots() {
   const mission = MISSION_SPECS[t.activeMissionKey];
   const allSlots = [...mission.slots, ...(t.scopeCreepAdded || [])];
   
-  const isC8 = (gameState.activeCrisis && gameState.activeCrisis.id === 8);
   const selectedCards = selectedHandIndices.map(i => t.hand[i]);
-  const hasValidSelection = isC8 
-    ? (selectedCards.length === 2 && selectedCards[0] === selectedCards[1])
-    : (selectedCards.length === 1);
+  const hasValidSelection = (selectedCards.length === 1);
 
   allSlots.forEach((slotType, idx) => {
     const slotDiv = document.createElement('div');
@@ -2401,14 +2540,12 @@ function updateActionButtons() {
   const isTurn = (targetId === gameState.activeTurnTeamId) || isHost || isSolo;
   const isActionPhase = (gameState.phase === 'ACTION');
 
-  const isC8 = (gameState.activeCrisis && gameState.activeCrisis.id === 8);
-  btnDraw.innerText = isC8 ? "Draw 3 Resource Cards (Rule Reset)" : "Draw 2 Resource Cards";
+  btnDraw.innerText = gameState.crisis8RuleResetActive ? "Draw 3 Resource Cards (Rule Reset)" : "Draw 2 Resource Cards";
 
   const isDrawBlocked = !isActionPhase || !isTurn || t.actionTakenThisRound || t.skipNextAction;
   btnDraw.disabled = isDrawBlocked || (gameState.drawDeck.length === 0 && gameState.discardDeck.length === 0);
 }
 
-// RENDER ACTIVE CREATED TEAMS (Up to 4)
 function renderAllTeamsGrid() {
   const grid = document.getElementById('all-teams-grid');
   grid.innerHTML = "";
