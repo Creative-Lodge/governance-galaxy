@@ -3,8 +3,10 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>GALAXY GOVERNANCE - Digital Transformation Boardroom</title>
-<script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+<title>GALAXY GOVERNANCE - Boardroom Simulation</title>
+<!-- MQTT.js over Secure WebSockets: Bypasses firewalls & works on all mobile/school networks -->
+<script src="https://unpkg.com/mqtt@5.3.5/dist/mqtt.min.js"></script>
+<!-- QRCode.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
 
@@ -57,7 +59,7 @@ button:hover:not(:disabled) {
   box-shadow: 0 0 15px var(--accent-cyan);
   border-color: var(--accent-cyan);
 }
-button:disabled { opacity: 0.4; cursor: not-allowed; }
+button:disabled { opacity: 0.35; cursor: not-allowed; }
 .btn-cyan { background: linear-gradient(135deg, #0284c7, #06b6d4); color: #fff; }
 .btn-gold { background: linear-gradient(135deg, #d97706, #f59e0b); color: #000; }
 .btn-red { background: linear-gradient(135deg, #b91c1c, #ef4444); color: #fff; }
@@ -86,7 +88,7 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
   text-align: center;
 }
 .lobby-box {
-  background: rgba(15, 23, 42, 0.9);
+  background: rgba(15, 23, 42, 0.92);
   border: 1px solid rgba(6, 182, 212, 0.3);
   backdrop-filter: blur(12px);
   padding: 30px;
@@ -271,18 +273,6 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
   width: 90%;
   text-align: center;
 }
-
-.notice-banner {
-  background: #451a03;
-  border: 1px solid var(--accent-gold);
-  color: #fde68a;
-  padding: 10px 15px;
-  border-radius: 8px;
-  margin-bottom: 15px;
-  font-size: 0.85rem;
-  line-height: 1.4;
-  text-align: left;
-}
 </style>
 </head>
 <body>
@@ -293,13 +283,6 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
   <p style="color: #94a3b8; margin-bottom: 20px;">Digital Transformation Boardroom Simulation</p>
 
   <div class="lobby-box">
-    <!-- Notice if on file:// -->
-    <div id="file-protocol-warning" class="notice-banner" style="display: none;">
-      ⚠️ <strong>Running from local disk (<code style="color:#fff;">file:///</code>)</strong>: Modern browsers block WebRTC across devices or separate tabs on local disk.<br/>
-      • <strong>To play with students:</strong> Host this file for free on <strong>GitHub Pages</strong> or drop it on <strong>Netlify Drop</strong>.<br/>
-      • <strong>To test right now on this screen:</strong> Use the <strong>"Local Sandbox Test"</strong> button below.
-    </div>
-
     <div style="display: flex; gap: 8px; margin-bottom: 20px;">
       <button id="tab-btn-join" class="btn-cyan" style="flex:1" onclick="switchLobbyTab('join')">Student Join</button>
       <button id="tab-btn-host" class="" style="flex:1" onclick="switchLobbyTab('host')">Facilitator</button>
@@ -326,15 +309,16 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
     <!-- FACILITATOR HOST FORM -->
     <div id="lobby-host-section" style="display: none;">
       <p style="color: #cbd5e1; font-size: 0.9rem; margin-bottom: 15px;">
-        Launch the live game room. Facilitator advances Action/Crisis phases, controls crisis cards, and projects the classroom board.
+        Launch the live game room. Advances Action/Crisis phases, controls crises, and projects boardroom scoreboard.
       </p>
       <button class="btn-gold" style="width: 100%; padding: 14px;" onclick="startHostGame()">LAUNCH NEW GAME ROOM</button>
+      <div id="host-status" style="margin-top: 10px; font-size: 0.85rem; color: var(--accent-gold);"></div>
     </div>
 
-    <!-- SOLO TEST / SANDBOX FORM -->
+    <!-- SOLO TEST FORM -->
     <div id="lobby-solo-section" style="display: none;">
       <p style="color: #cbd5e1; font-size: 0.9rem; margin-bottom: 15px;">
-        <strong>Offline Sandbox:</strong> Play and test everything on a single device without needing WebRTC or a server. You can toggle between Facilitator and Teams 1-4 with a single click.
+        Test all 4 teams and facilitator controls on a single screen without needing extra players.
       </p>
       <button class="btn-green" style="width: 100%; padding: 14px;" onclick="startSoloTest()">LAUNCH OFFLINE SANDBOX</button>
     </div>
@@ -345,13 +329,14 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 <div id="view-game" style="display: none;">
   <!-- Header Bar -->
   <div class="top-bar">
-    <div>
+    <div style="display: flex; align-items: center;">
       <span class="brand-font" style="font-size: 1.15rem; color: var(--accent-cyan);">GALAXY GOVERNANCE</span>
       <span id="room-code-tag" class="badge" style="margin-left: 8px; background: #334155; color: #fff;">ROOM: ----</span>
+      <span id="network-status-tag" class="badge" style="margin-left: 6px; background: #064e3b; color: #34d399;">🟢 Connected</span>
       <span id="my-identity-tag" class="badge badge-innovation" style="margin-left: 6px;">Spectator</span>
     </div>
 
-    <!-- Team Switcher for Facilitator / Solo Tester -->
+    <!-- Simulator Switcher -->
     <div id="dev-team-switcher" style="display: none; align-items: center; gap: 6px;">
       <span style="font-size: 0.8rem; color: #94a3b8;">Simulate Team:</span>
       <button style="padding: 4px 8px; font-size: 0.75rem;" onclick="switchSimulatedTeam(1)">T1</button>
@@ -385,12 +370,10 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
       <div id="my-team-dashboard" style="background: var(--bg-panel); border-radius: 12px; padding: 20px; border: 1px solid #334155; margin-bottom: 20px;">
         <div style="display: flex; justify-content: space-between; align-items: center;">
           <h3>ACTIVE BOARD: <span id="my-team-name-label" style="color: var(--accent-cyan);">Team 1</span></h3>
-          <div>
-            Score: <strong id="my-team-points" style="color: var(--accent-gold); font-size: 1.3rem;">0</strong>
-          </div>
+          <div>Score: <strong id="my-team-points" style="color: var(--accent-gold); font-size: 1.3rem;">0</strong></div>
         </div>
 
-        <!-- Mission selection dropdown if not yet chosen -->
+        <!-- Mission Selection -->
         <div id="mission-pick-row" style="margin: 15px 0; background: #1e293b; padding: 12px; border-radius: 8px; display: none;">
           <span style="font-weight: bold; margin-right: 10px;">Select Mission to Start:</span>
           <button class="btn-cyan" onclick="clientSelectMission('alpha')">Mission Alpha (High: 10 pts)</button>
@@ -398,7 +381,7 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
           <button class="btn-gold" onclick="clientSelectMission('beta')">Mission Beta (Low: 4 pts)</button>
         </div>
 
-        <!-- Current Mission in progress -->
+        <!-- Current Mission Progress -->
         <div id="current-mission-container" class="mission-progress-box">
           <div style="display: flex; justify-content: space-between;">
             <h4 id="active-mission-title">Mission: Inactive</h4>
@@ -411,12 +394,12 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
         <div style="margin-top: 20px;">
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <h4>Your Team's Resource Hand (<span id="hand-count">0</span>)</h4>
-            <span style="font-size: 0.85rem; color: #94a3b8;">Click card to play on current slot</span>
+            <span style="font-size: 0.85rem; color: #94a3b8;">Click card to select</span>
           </div>
           <div id="my-hand-cards" class="hand-container"></div>
         </div>
 
-        <!-- Action Phase Controls -->
+        <!-- Action Controls -->
         <div id="player-action-controls" style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
           <button class="btn-cyan" id="btn-work-mission" onclick="clientCommitPlayCard()" disabled>Work on Mission (Play Selected)</button>
           <button class="btn-gold" id="btn-draw-resources" onclick="clientDrawResources()">Draw 2 Resource Cards</button>
@@ -424,12 +407,12 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
         </div>
       </div>
 
-      <!-- All Teams Overview (Leaderboard) -->
+      <!-- All Teams Overview -->
       <h3>Galaxy Boardroom: All Teams Overview</h3>
       <div id="all-teams-grid" class="board-grid" style="margin-top: 10px;"></div>
     </div>
 
-    <!-- Sidebar: Decks & Facilitator Controls -->
+    <!-- Sidebar: Central Decks & Host Controls -->
     <div>
       <div style="background: var(--bg-panel); border-radius: 12px; padding: 18px; border: 1px solid #334155; margin-bottom: 20px;">
         <h4>CENTRAL DECKS</h4>
@@ -452,7 +435,6 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
       <!-- Facilitator Panel -->
       <div id="host-controls-panel" class="host-panel" style="display: none;">
         <h4 style="color: var(--accent-gold); margin-bottom: 12px;">FACILITATOR CONTROLS</h4>
-        
         <div style="display: flex; flex-direction: column; gap: 10px;">
           <button class="btn-cyan" onclick="hostNextPhase()">
             Cycle Phase: <span id="host-btn-phase-label">Start Crisis Phase</span>
@@ -526,24 +508,9 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 
 <script>
 const MISSION_SPECS = {
-  alpha: {
-    id: 'alpha',
-    name: 'Mission Alpha (High Value)',
-    value: 10,
-    slots: ['BUDGET', 'DATA', 'INNOVATION', 'BUDGET', 'DATA', 'INNOVATION', 'DATA']
-  },
-  gamma: {
-    id: 'gamma',
-    name: 'Mission Gamma (Medium Value)',
-    value: 7,
-    slots: ['INNOVATION', 'BUDGET', 'BUDGET', 'DATA', 'INNOVATION', 'BUDGET', 'DATA']
-  },
-  beta: {
-    id: 'beta',
-    name: 'Mission Beta (Low Value)',
-    value: 4,
-    slots: ['COMPLIANCE', 'BUDGET', 'DATA', 'COMPLIANCE', 'BUDGET', 'DATA']
-  }
+  alpha: { id: 'alpha', name: 'Mission Alpha (High Value)', value: 10, slots: ['BUDGET', 'DATA', 'INNOVATION', 'BUDGET', 'DATA', 'INNOVATION', 'DATA'] },
+  gamma: { id: 'gamma', name: 'Mission Gamma (Medium Value)', value: 7, slots: ['INNOVATION', 'BUDGET', 'BUDGET', 'DATA', 'INNOVATION', 'BUDGET', 'DATA'] },
+  beta: { id: 'beta', name: 'Mission Beta (Low Value)', value: 4, slots: ['COMPLIANCE', 'BUDGET', 'DATA', 'COMPLIANCE', 'BUDGET', 'DATA'] }
 };
 
 const CRISIS_DECK = [
@@ -566,9 +533,7 @@ const CRISIS_DECK = [
 
 let isHost = false;
 let isSolo = false;
-let myPeer = null;
-let hostConn = null;
-let studentConns = [];
+let mqttClient = null;
 let myTeamId = 1;
 let myPlayerName = "Board Member";
 let selectedCardIndex = null;
@@ -590,9 +555,6 @@ let gameState = {
 };
 
 window.addEventListener('load', () => {
-  if (window.location.protocol === 'file:') {
-    document.getElementById('file-protocol-warning').style.display = 'block';
-  }
   const urlParams = new URLSearchParams(window.location.search);
   const r = urlParams.get('room');
   if (r) document.getElementById('join-room-code').value = r.toUpperCase();
@@ -632,9 +594,7 @@ function drawCardsForTeam(teamId, count) {
           const k = Math.floor(Math.random() * (j + 1));
           [gameState.drawDeck[j], gameState.drawDeck[k]] = [gameState.drawDeck[k], gameState.drawDeck[j]];
         }
-      } else {
-        break;
-      }
+      } else break;
     }
     team.hand.push(gameState.drawDeck.pop());
   }
@@ -646,26 +606,36 @@ function dealStartingCards() {
   }
 }
 
-function startSoloTest() {
-  isHost = true;
-  isSolo = true;
-  gameState.roomCode = "SOLO";
-  initMainDeck();
-  dealStartingCards();
+/* =========================================================================
+   MQTT REALTIME NETWORKING (Reliable WebSockets, No WebRTC firewalls)
+   ========================================================================= */
 
-  document.getElementById('view-lobby').style.display = 'none';
-  document.getElementById('view-game').style.display = 'block';
-  document.getElementById('host-controls-panel').style.display = 'block';
-  document.getElementById('dev-team-switcher').style.display = 'flex';
-  document.getElementById('room-code-tag').innerText = `ROOM: SOLO-TEST`;
-  document.getElementById('my-identity-tag').innerText = `FACILITATOR + SIMULATOR`;
-  renderUI();
-}
+function connectMqtt(onConnectCb) {
+  // Free public secure broker over port 8884/8084 (TLS/WSS)
+  const broker = 'wss://broker.hivemq.com:8884/mqtt';
+  const client = mqtt.connect(broker, {
+    clientId: 'gg_' + Math.random().toString(16).substring(2, 10),
+    keepalive: 60
+  });
 
-function switchSimulatedTeam(teamId) {
-  myTeamId = teamId;
-  selectedCardIndex = null;
-  renderUI();
+  client.on('connect', () => {
+    console.log("Connected to HiveMQ Cloud WebSocket Broker");
+    document.getElementById('network-status-tag').innerText = "🟢 Cloud Connected";
+    document.getElementById('network-status-tag').style.background = "#064e3b";
+    onConnectCb();
+  });
+
+  client.on('error', (err) => {
+    console.warn("HiveMQ failed, trying fallback broker...", err);
+    document.getElementById('network-status-tag').innerText = "🟡 Connecting...";
+  });
+
+  client.on('offline', () => {
+    document.getElementById('network-status-tag').innerText = "🔴 Reconnecting...";
+    document.getElementById('network-status-tag').style.background = "#7f1d1d";
+  });
+
+  return client;
 }
 
 function startHostGame() {
@@ -679,27 +649,32 @@ function startHostGame() {
   initMainDeck();
   dealStartingCards();
 
-  const peerId = `gg-room-${roomCode.toLowerCase()}`;
-  myPeer = new Peer(peerId);
+  document.getElementById('host-status').innerText = "Connecting to boardroom cloud...";
 
-  myPeer.on('open', () => {
+  mqttClient = connectMqtt(() => {
+    const topicAction = `galaxy-gov/${roomCode}/action`;
+    const topicState = `galaxy-gov/${roomCode}/state`;
+
+    // Host listens for student actions
+    mqttClient.subscribe(topicAction);
+
+    mqttClient.on('message', (topic, payload) => {
+      if (topic === topicAction) {
+        try {
+          const data = JSON.parse(payload.toString());
+          handleHostReceiveData(data);
+        } catch(e) { console.error(e); }
+      }
+    });
+
     document.getElementById('view-lobby').style.display = 'none';
     document.getElementById('view-game').style.display = 'block';
     document.getElementById('host-controls-panel').style.display = 'block';
     document.getElementById('room-code-tag').innerText = `ROOM: ${roomCode}`;
     document.getElementById('my-identity-tag').innerText = `FACILITATOR`;
+
     broadcastGameState();
     renderUI();
-  });
-
-  myPeer.on('connection', (conn) => {
-    studentConns.push(conn);
-    conn.on('data', (data) => handleHostReceiveData(data, conn));
-    conn.on('open', () => conn.send({ type: 'STATE_SYNC', state: gameState }));
-  });
-
-  myPeer.on('error', (err) => {
-    alert("Connection error. If running from local disk (file:///), please use Solo Test mode or host online.");
   });
 }
 
@@ -714,43 +689,55 @@ function joinAsStudent() {
     return;
   }
 
-  statusEl.innerText = "Connecting to boardroom...";
+  statusEl.innerText = "Connecting to room " + code + "...";
   isHost = false;
   isSolo = false;
   myTeamId = team;
   myPlayerName = name;
 
-  myPeer = new Peer();
-  myPeer.on('open', () => {
-    const hostPeerId = `gg-room-${code.toLowerCase()}`;
-    hostConn = myPeer.connect(hostPeerId);
+  mqttClient = connectMqtt(() => {
+    const topicState = `galaxy-gov/${code}/state`;
+    const topicAction = `galaxy-gov/${code}/action`;
 
-    hostConn.on('open', () => {
-      document.getElementById('view-lobby').style.display = 'none';
-      document.getElementById('view-game').style.display = 'block';
-      document.getElementById('room-code-tag').innerText = `ROOM: ${code}`;
-      document.getElementById('my-identity-tag').innerText = `Team ${myTeamId}`;
-      hostConn.send({ type: 'PLAYER_JOIN', teamId: myTeamId, name: myPlayerName });
-    });
+    mqttClient.subscribe(topicState);
 
-    hostConn.on('data', (data) => {
-      if (data.type === 'STATE_SYNC') {
-        gameState = data.state;
-        renderUI();
+    mqttClient.on('message', (topic, payload) => {
+      if (topic === topicState) {
+        try {
+          gameState = JSON.parse(payload.toString());
+          renderUI();
+        } catch(e) { console.error(e); }
       }
     });
-  });
 
-  myPeer.on('error', (err) => {
-    statusEl.innerHTML = `<span style="color:var(--accent-red)">Could not connect. Note: Peer-to-peer across tabs/phones requires HTTPS hosting (e.g. GitHub Pages or Netlify).</span>`;
+    // Notify host that player joined
+    mqttClient.publish(topicAction, JSON.stringify({ type: 'PLAYER_JOIN', teamId: myTeamId, name: myPlayerName }));
+
+    document.getElementById('view-lobby').style.display = 'none';
+    document.getElementById('view-game').style.display = 'block';
+    document.getElementById('room-code-tag').innerText = `ROOM: ${code}`;
+    document.getElementById('my-identity-tag').innerText = `Team ${myTeamId}`;
+    document.getElementById('my-identity-tag').className = 'badge badge-budget';
   });
 }
 
+function broadcastGameState() {
+  renderUI();
+  if (isSolo || !isHost || !mqttClient) return;
+  const topicState = `galaxy-gov/${gameState.roomCode}/state`;
+  mqttClient.publish(topicState, JSON.stringify(gameState), { retain: true });
+}
+
 function handleHostReceiveData(data) {
+  if (!isHost) return;
   const t = gameState.teams[data.teamId];
   if (!t) return;
 
   switch(data.type) {
+    case 'PLAYER_JOIN':
+      broadcastGameState();
+      break;
+
     case 'SELECT_MISSION':
       if (!t.activeMissionKey) {
         t.activeMissionKey = data.missionKey;
@@ -800,13 +787,31 @@ function handleHostReceiveData(data) {
   }
 }
 
-function broadcastGameState() {
+function startSoloTest() {
+  isHost = true;
+  isSolo = true;
+  gameState.roomCode = "SOLO";
+  initMainDeck();
+  dealStartingCards();
+
+  document.getElementById('view-lobby').style.display = 'none';
+  document.getElementById('view-game').style.display = 'block';
+  document.getElementById('host-controls-panel').style.display = 'block';
+  document.getElementById('dev-team-switcher').style.display = 'flex';
+  document.getElementById('room-code-tag').innerText = `ROOM: SOLO-TEST`;
+  document.getElementById('my-identity-tag').innerText = `SANDBOX`;
   renderUI();
-  if (isSolo || !isHost) return;
-  studentConns.forEach(conn => {
-    if (conn.open) conn.send({ type: 'STATE_SYNC', state: gameState });
-  });
 }
+
+function switchSimulatedTeam(teamId) {
+  myTeamId = teamId;
+  selectedCardIndex = null;
+  renderUI();
+}
+
+/* =========================================================================
+   HOST FACILITATOR CONTROLS
+   ========================================================================= */
 
 function hostNextPhase() {
   if (gameState.phase === 'ACTION') {
@@ -898,14 +903,21 @@ function toggleProjectorView() {
   myDash.style.display = myDash.style.display === 'none' ? 'block' : 'none';
 }
 
-function clientSelectMission(missionKey) {
+/* =========================================================================
+   CLIENT ACTIONS
+   ========================================================================= */
+
+function clientSendAction(payload) {
   if (isHost || isSolo) {
-    gameState.teams[myTeamId].activeMissionKey = missionKey;
-    gameState.teams[myTeamId].missionProgress = 0;
-    broadcastGameState();
-  } else {
-    hostConn.send({ type: 'SELECT_MISSION', teamId: myTeamId, missionKey: missionKey });
+    handleHostReceiveData(payload);
+  } else if (mqttClient) {
+    const topicAction = `galaxy-gov/${gameState.roomCode || document.getElementById('join-room-code').value.trim().toUpperCase()}/action`;
+    mqttClient.publish(topicAction, JSON.stringify(payload));
   }
+}
+
+function clientSelectMission(missionKey) {
+  clientSendAction({ type: 'SELECT_MISSION', teamId: myTeamId, missionKey: missionKey });
 }
 
 function clientSelectCard(index) {
@@ -916,31 +928,23 @@ function clientSelectCard(index) {
 
 function clientCommitPlayCard() {
   if (selectedCardIndex === null) return;
-  if (isHost || isSolo) {
-    handleHostReceiveData({ type: 'ACTION_WORK_MISSION', teamId: myTeamId, cardIndex: selectedCardIndex });
-  } else {
-    hostConn.send({ type: 'ACTION_WORK_MISSION', teamId: myTeamId, cardIndex: selectedCardIndex });
-  }
+  clientSendAction({ type: 'ACTION_WORK_MISSION', teamId: myTeamId, cardIndex: selectedCardIndex });
   selectedCardIndex = null;
 }
 
 function clientDrawResources() {
-  if (isHost || isSolo) {
-    handleHostReceiveData({ type: 'ACTION_DRAW', teamId: myTeamId });
-  } else {
-    hostConn.send({ type: 'ACTION_DRAW', teamId: myTeamId });
-  }
+  clientSendAction({ type: 'ACTION_DRAW', teamId: myTeamId });
 }
 
 function clientDiscardCard() {
   if (selectedCardIndex === null) return;
-  if (isHost || isSolo) {
-    handleHostReceiveData({ type: 'ACTION_DISCARD', teamId: myTeamId, cardIndex: selectedCardIndex });
-  } else {
-    hostConn.send({ type: 'ACTION_DISCARD', teamId: myTeamId, cardIndex: selectedCardIndex });
-  }
+  clientSendAction({ type: 'ACTION_DISCARD', teamId: myTeamId, cardIndex: selectedCardIndex });
   selectedCardIndex = null;
 }
+
+/* =========================================================================
+   UI RENDERING
+   ========================================================================= */
 
 function renderUI() {
   const phaseEl = document.getElementById('phase-badge');
