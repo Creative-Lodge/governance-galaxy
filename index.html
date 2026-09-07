@@ -280,6 +280,26 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
   box-shadow: 0 0 16px #fff;
 }
 
+.res-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  border: 1px solid #475569;
+  cursor: pointer;
+  user-select: none;
+  background: #1e293b;
+  transition: all 0.15s;
+}
+.res-chip.selected {
+  outline: 2px solid #fff;
+  box-shadow: 0 0 8px #fff;
+  transform: translateY(-2px);
+}
+
 .crisis-banner {
   background: linear-gradient(90deg, #7f1d1d, #450a0a);
   border: 2px solid var(--accent-red);
@@ -369,7 +389,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
       <input type="text" id="join-room-code" class="lobby-input" placeholder="ENTER 6-LETTER ROOM CODE" maxlength="6" style="text-transform: uppercase;" />
       <input type="text" id="player-name" class="lobby-input" placeholder="Your Name" />
       <div style="margin: 10px 0; text-align: left;">
-        <label style="font-size: 0.85rem; color: #94a3b8; font-weight: bold;">SELECT YOUR TEAM:</label>
+        <label style="font-size: 0.85rem; color: #94a3b8; font-weight: bold;">JOIN A BOARDROOM TEAM (UP TO 4 TEAMS):</label>
         <select id="select-team" class="lobby-input" style="text-align: left;">
           <option value="1">Team 1: Alpha Cyber Vanguard</option>
           <option value="2">Team 2: Stellar FinTech</option>
@@ -384,11 +404,10 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
     <!-- FACILITATOR HOST & RESUME FORM -->
     <div id="lobby-host-section" style="display: none;">
       <p style="color: #cbd5e1; font-size: 0.9rem; margin-bottom: 15px;">
-        Host classroom simulation, cycle phases, and review governance actions.
+        Host classroom simulation, cycle phases, and review governance actions. Teams activate as students join.
       </p>
       <button class="btn-gold" style="width: 100%; padding: 14px;" onclick="startHostGame()">LAUNCH NEW GAME ROOM</button>
       
-      <!-- Resume Existing Room -->
       <div style="border-top: 1px solid #334155; margin-top: 20px; padding-top: 15px; text-align: left;">
         <span style="font-size: 0.85rem; font-weight: bold; color: var(--accent-cyan);">RESUME PREVIOUS ROOM:</span>
         <div style="display: flex; gap: 8px; margin-top: 6px;">
@@ -539,8 +558,11 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
         </div>
       </div>
 
-      <!-- All Teams Overview -->
-      <h3>Galaxy Boardroom: All Teams Overview</h3>
+      <!-- All Teams Overview (Only Shows Created Teams with Joined Participants) -->
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h3>Galaxy Boardroom: Active Teams</h3>
+        <span id="active-teams-count-badge" class="badge badge-cyan" style="background:#1e293b; color:var(--accent-cyan);">0 Teams Joined</span>
+      </div>
       <div id="all-teams-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 10px;"></div>
     </div>
 
@@ -569,15 +591,15 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
         <h4 style="color: var(--accent-gold); margin-bottom: 12px;">FACILITATOR CONTROLS</h4>
         
         <div style="background: #090e17; padding: 10px; border-radius: 8px; border: 1px solid var(--accent-cyan); margin-bottom: 12px;">
-          <span style="font-size: 0.8rem; color: #94a3b8; font-weight: bold;">TOGGLE & FOCUS TEAM:</span>
-          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-top: 6px;">
+          <span style="font-size: 0.8rem; color: #94a3b8; font-weight: bold;">TOGGLE ACTIVE TEAMS:</span>
+          <div id="fac-team-toggle-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-top: 6px;">
             <button id="btn-turn-t1" style="padding: 6px 2px; font-size: 0.75rem;" onclick="hostSetTurn(1)">T1</button>
             <button id="btn-turn-t2" style="padding: 6px 2px; font-size: 0.75rem;" onclick="hostSetTurn(2)">T2</button>
             <button id="btn-turn-t3" style="padding: 6px 2px; font-size: 0.75rem;" onclick="hostSetTurn(3)">T3</button>
             <button id="btn-turn-t4" style="padding: 6px 2px; font-size: 0.75rem;" onclick="hostSetTurn(4)">T4</button>
           </div>
           <button class="btn-cyan" style="width: 100%; margin-top: 8px; padding: 8px;" onclick="hostCycleNextTurn()">
-            Next Team Turn ⏭️
+            Next Active Team Turn ⏭️
           </button>
         </div>
 
@@ -619,21 +641,8 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
               <span style="font-size: 0.85rem; font-weight: bold; color: var(--accent-gold);">UNDO ACTIONS:</span>
               <span style="font-size: 0.75rem; color: #94a3b8;">Revert misclicks</span>
             </div>
-            <div class="undo-bar">
-              <span style="font-size: 0.85rem;">Team 1</span>
-              <button class="btn-red" style="padding: 4px 10px; font-size: 0.75rem;" onclick="hostUndoTeamAction(1)">Undo T1</button>
-            </div>
-            <div class="undo-bar">
-              <span style="font-size: 0.85rem;">Team 2</span>
-              <button class="btn-red" style="padding: 4px 10px; font-size: 0.75rem;" onclick="hostUndoTeamAction(2)">Undo T2</button>
-            </div>
-            <div class="undo-bar">
-              <span style="font-size: 0.85rem;">Team 3</span>
-              <button class="btn-red" style="padding: 4px 10px; font-size: 0.75rem;" onclick="hostUndoTeamAction(3)">Undo T3</button>
-            </div>
-            <div class="undo-bar">
-              <span style="font-size: 0.85rem;">Team 4</span>
-              <button class="btn-red" style="padding: 4px 10px; font-size: 0.75rem;" onclick="hostUndoTeamAction(4)">Undo T4</button>
+            <div id="undo-buttons-list">
+              <!-- Dynamically populated for created teams -->
             </div>
           </div>
 
@@ -661,12 +670,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
     <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 15px;">Grant a reserve card to any team.</p>
     <div style="margin-bottom: 12px; text-align: left;">
       <label>Target Team:</label>
-      <select id="fac-grant-team" class="lobby-input" style="text-align: left;">
-        <option value="1">Team 1</option>
-        <option value="2">Team 2</option>
-        <option value="3">Team 3</option>
-        <option value="4">Team 4</option>
-      </select>
+      <select id="fac-grant-team" class="lobby-input" style="text-align: left;"></select>
     </div>
     <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 20px;">
       <button class="badge-budget" onclick="hostExecuteGrant('BUDGET')">Budget (<span id="cnt-f-b">8</span>)</button>
@@ -706,7 +710,7 @@ const CRISIS_DECK = [
   { id: 7, name: "The Patent Race", flavor: "Competitor is filing identical technology! First to file wins.", effect: "SIMULTANEOUS: First team to discard 3 Innovation + 1 Budget gains 2 progress units & draws 2 cards!" },
   { id: 8, name: "Rule Reset", flavor: "A global black swan event reshapes the industry.", effect: "Work on Mission requires 2x matching resources. Draw Resources draws 3 cards." },
   { id: 9, name: "Market Disruption", flavor: "Competitor launch makes mission obsolete.", effect: "Spend 1 Innovation + 1 Budget to cancel, or current mission value drops by 2 points." },
-  { id: 10, name: "Resource Snipe", flavor: "Critical component shortage creates seller's market.", effect: "Inspect the next team's hand. Select 2 cards from your hand and swap with 2 of theirs." },
+  { id: 10, name: "Resource Snipe", flavor: "Critical component shortage creates seller's market.", effect: "Inspect the next active team's hand. Select 2 cards from your hand and swap with 2 of theirs." },
   { id: 11, name: "The Great Resignation", flavor: "Mid-level leadership has been poached.", effect: "Discard cards based on completed missions: 0 missions = 1 card, 1 mission = 2 cards, 2 missions = 3 cards." },
   { id: 12, name: "Regulatory Scrutiny", flavor: "Antitrust investigation underway for market leaders.", effect: "Team with the most progress must discard 3 Compliance Cards, or ALL other teams draw 2 cards." },
   { id: 13, name: "Ecosystem Partnership", flavor: "Platform giant offers strategic partnership.", effect: "Choose: Remain Independent OR Form Partnership (+2 progress units on active mission, but reduces all mission values by 3 pts)." },
@@ -719,7 +723,8 @@ let isSolo = false;
 let mqttClient = null;
 let myTeamId = 1;
 let myPlayerName = "Board Member";
-let selectedHandIndices = [];
+let selectedHandIndices = []; // Cards chosen from own hand
+let selectedTargetHandIndices = []; // Cards chosen from target hand in Crisis 10
 let teamActionHistory = { 1: [], 2: [], 3: [], 4: [] };
 
 let gameState = {
@@ -757,6 +762,26 @@ function createDefaultTeamState(name) {
     completedMissions: [],
     missionValuePenalty: 0
   };
+}
+
+// DYNAMIC ACTIVE TEAMS: Created only when participants join
+function getActiveTeamIds() {
+  if (isSolo) return [1, 2, 3, 4];
+  const active = [];
+  for (let id = 1; id <= 4; id++) {
+    if (gameState.teams[id].members && gameState.teams[id].members.length > 0) {
+      active.push(id);
+    }
+  }
+  return active.length > 0 ? active : [1];
+}
+
+function getNextActiveTeamId(currentId) {
+  const activeIds = getActiveTeamIds();
+  if (activeIds.length <= 1) return null;
+  const currentIndex = activeIds.indexOf(currentId);
+  if (currentIndex === -1) return activeIds[0];
+  return activeIds[(currentIndex + 1) % activeIds.length];
 }
 
 function playAlertBeep(isAlert = false) {
@@ -1117,7 +1142,6 @@ function handleHostReceiveData(data) {
       snapshotTeamState(data.teamId, `Fulfilled Crisis: ${data.detail}`);
       t.crisisResolvedThisPhase = true;
 
-      // Real card deductions
       if (data.deductCards && data.deductCards.length > 0) {
         data.deductCards.forEach(type => {
           const idx = t.hand.indexOf(type);
@@ -1128,11 +1152,11 @@ function handleHostReceiveData(data) {
         });
       }
 
-      // Crisis 4 Wipe Progress completely
+      // Crisis 4: Wipe Progress completely
       if (data.action === 'crisis4_wipe') {
         t.activeMissionFilledSlots = [];
       }
-      // Crisis 4 Gain 2 Innovation Cards Strictly
+      // Crisis 4: Gain 2 Innovation Cards Strictly
       if (data.action === 'crisis4_gain_inno') {
         for (let i = 0; i < 2; i++) {
           const innoIdx = gameState.drawDeck.indexOf('INNOVATION');
@@ -1179,21 +1203,20 @@ function handleHostReceiveData(data) {
         t.missionValuePenalty = (t.missionValuePenalty || 0) + 2;
       }
 
-      // Crisis 10 swap
+      // Crisis 10: Forced 2-Card Swap between Active Teams
       if (data.action === 'crisis10_swap') {
-        const nextId = (data.teamId % 4) + 1;
-        const nextTeam = gameState.teams[nextId];
+        const targetTeam = gameState.teams[data.targetTeamId];
         data.myCards.forEach(c => {
           const idx = t.hand.indexOf(c);
           if (idx > -1) t.hand.splice(idx, 1);
-          nextTeam.hand.push(c);
+          targetTeam.hand.push(c);
         });
         data.theirCards.forEach(c => {
-          const idx = nextTeam.hand.indexOf(c);
-          if (idx > -1) nextTeam.hand.splice(idx, 1);
+          const idx = targetTeam.hand.indexOf(c);
+          if (idx > -1) targetTeam.hand.splice(idx, 1);
           t.hand.push(c);
         });
-        showFacilitatorToast(`🔄 Team ${data.teamId} swapped 2 cards with Team ${nextId}!`);
+        showFacilitatorToast(`🔄 FORCED SWAP: Team ${data.teamId} swapped [${data.myCards.join(',')}] with Team ${data.targetTeamId} [${data.theirCards.join(',')}]!`, 'gold');
       }
 
       // Crisis 13 partnership
@@ -1256,23 +1279,24 @@ function switchSimulatedTeam(teamId) {
   myTeamId = teamId;
   gameState.activeTurnTeamId = teamId;
   selectedHandIndices = [];
+  selectedTargetHandIndices = [];
   renderUI();
 }
 
 /* =========================================================================
-   FACILITATOR PACING & LOOPING
+   FACILITATOR PACING & ACTIVE TEAM CYCLING
    ========================================================================= */
 
 function hostSetTurn(teamId) {
   if (!isHost) return;
   gameState.activeTurnTeamId = teamId;
   selectedHandIndices = [];
+  selectedTargetHandIndices = [];
 
-  // Consume skip penalty on the active turn so teams don't skip forever
   const currentTeam = gameState.teams[teamId];
   if (gameState.phase === 'ACTION' && currentTeam.skipNextAction) {
     currentTeam.actionTakenThisRound = true;
-    currentTeam.skipNextAction = false; // Consumed!
+    currentTeam.skipNextAction = false;
     showFacilitatorToast(`🚫 Team ${teamId}'s action turn was forfeited due to previous crisis penalty.`, 'alert');
   }
 
@@ -1282,9 +1306,10 @@ function hostSetTurn(teamId) {
 
 function hostCycleNextTurn() {
   if (!isHost) return;
-  let next = gameState.activeTurnTeamId + 1;
-  if (next > 4) next = 1;
-  hostSetTurn(next);
+  const activeIds = getActiveTeamIds();
+  const curIdx = activeIds.indexOf(gameState.activeTurnTeamId);
+  const nextId = (curIdx === -1) ? activeIds[0] : activeIds[(curIdx + 1) % activeIds.length];
+  hostSetTurn(nextId);
 }
 
 function hostTriggerNextCrisis() {
@@ -1297,15 +1322,19 @@ function hostTriggerNextCrisis() {
   gameState.activeCrisis = crisis;
   gameState.currentCrisisIndex++;
   gameState.phase = 'CRISIS';
-  gameState.activeTurnTeamId = 1;
+  
+  const activeIds = getActiveTeamIds();
+  gameState.activeTurnTeamId = activeIds[0];
   gameState.patentRaceClaimed = false;
   gameState.crisis14Bids = {};
+  selectedHandIndices = [];
+  selectedTargetHandIndices = [];
 
   for (let id in gameState.teams) {
     gameState.teams[id].crisisResolvedThisPhase = false;
   }
 
-  // Crisis 3: Automatically apply scope creep (no team buttons/input required)
+  // Crisis 3: Automatically apply scope creep
   if (crisis.id === 3) {
     for (let id in gameState.teams) {
       if (gameState.teams[id].activeMissionKey) {
@@ -1322,8 +1351,12 @@ function hostTriggerNextCrisis() {
 function hostConcludeCrisisAndStartAction() {
   if (!isHost) return;
   gameState.phase = 'ACTION';
-  gameState.activeCrisis = null; // Clears crisis banner
-  gameState.activeTurnTeamId = 1;
+  gameState.activeCrisis = null;
+  
+  const activeIds = getActiveTeamIds();
+  gameState.activeTurnTeamId = activeIds[0];
+  selectedHandIndices = [];
+  selectedTargetHandIndices = [];
 
   for (let id in gameState.teams) {
     const tm = gameState.teams[id];
@@ -1331,14 +1364,14 @@ function hostConcludeCrisisAndStartAction() {
     tm.crisisResolvedThisPhase = false;
   }
 
-  // Check Team 1 penalty
-  if (gameState.teams[1].skipNextAction) {
-    gameState.teams[1].actionTakenThisRound = true;
-    gameState.teams[1].skipNextAction = false;
-    showFacilitatorToast(`🚫 Team 1 action turn forfeited.`, 'alert');
+  const firstTeam = gameState.teams[activeIds[0]];
+  if (firstTeam.skipNextAction) {
+    firstTeam.actionTakenThisRound = true;
+    firstTeam.skipNextAction = false;
+    showFacilitatorToast(`🚫 Team ${activeIds[0]} action turn forfeited.`, 'alert');
   }
 
-  showFacilitatorToast(`▶️ Action Phase started! Boardroom focus on Team 1.`);
+  showFacilitatorToast(`▶️ Action Phase started! Boardroom focus on Team ${activeIds[0]}.`);
   broadcastGameState();
 }
 
@@ -1357,6 +1390,15 @@ function hostOpenFacPoolModal() {
   document.getElementById('cnt-f-d').innerText = gameState.facilitatorPool.DATA;
   document.getElementById('cnt-f-i').innerText = gameState.facilitatorPool.INNOVATION;
   document.getElementById('cnt-f-c').innerText = gameState.facilitatorPool.COMPLIANCE;
+
+  const sel = document.getElementById('fac-grant-team');
+  sel.innerHTML = "";
+  getActiveTeamIds().forEach(tid => {
+    const opt = document.createElement('option');
+    opt.value = tid;
+    opt.innerText = `Team ${tid} (${gameState.teams[tid].name})`;
+    sel.appendChild(opt);
+  });
 }
 
 function hostExecuteGrant(cardType) {
@@ -1421,7 +1463,7 @@ function hostResolveCrisis14Bids() {
 
 function hostExecuteCrisis15() {
   let counts = [];
-  for (let id = 1; id <= 4; id++) {
+  getActiveTeamIds().forEach(id => {
     const t = gameState.teams[id];
     let compCount = t.hand.filter(c => c === 'COMPLIANCE').length;
     if (t.activeMissionKey) {
@@ -1431,23 +1473,21 @@ function hostExecuteCrisis15() {
       });
     }
     counts.push({ id: id, count: compCount });
-  }
+  });
 
   counts.sort((a, b) => b.count - a.count);
   const mostCompTeamId = counts[0].id;
   const leastCompTeamId = counts[counts.length - 1].id;
 
-  // Award 2 budget
   gameState.teams[mostCompTeamId].hand.push('BUDGET', 'BUDGET');
 
-  // Deduct 1 innovation
   const innoIdx = gameState.teams[leastCompTeamId].hand.indexOf('INNOVATION');
   if (innoIdx > -1) {
     const rm = gameState.teams[leastCompTeamId].hand.splice(innoIdx, 1)[0];
     gameState.discardDeck.push(rm);
   }
 
-  for (let id = 1; id <= 4; id++) gameState.teams[id].crisisResolvedThisPhase = true;
+  for (let id in gameState.teams) gameState.teams[id].crisisResolvedThisPhase = true;
 
   showFacilitatorToast(`⚖️ DIGITAL TRANSPARENCY ACT: Team ${mostCompTeamId} gained 2 Budget; Team ${leastCompTeamId} lost 1 Innovation!`, 'gold');
   broadcastGameState();
@@ -1455,7 +1495,7 @@ function hostExecuteCrisis15() {
 
 function hostEvaluateWinner() {
   let teamsArr = [];
-  for (let id = 1; id <= 4; id++) {
+  getActiveTeamIds().forEach(id => {
     const t = gameState.teams[id];
     let curMissionVal = 0;
     if (t.activeMissionKey) curMissionVal = MISSION_SPECS[t.activeMissionKey].value;
@@ -1469,7 +1509,7 @@ function hostEvaluateWinner() {
       currentProgressUnits: t.activeMissionFilledSlots.length,
       currentMissionValue: curMissionVal
     });
-  }
+  });
 
   teamsArr.sort((a, b) => {
     if (b.completedCount === 3 || a.completedCount === 3) {
@@ -1523,16 +1563,14 @@ function clientToggleHandCard(index) {
   const isC10 = (gameState.activeCrisis && gameState.activeCrisis.id === 10);
   const isC11 = (gameState.activeCrisis && gameState.activeCrisis.id === 11);
 
-  if (isC8) {
+  if (isC8 || isC10) {
+    // Up to 2 cards
     if (selectedHandIndices.includes(index)) {
       selectedHandIndices = selectedHandIndices.filter(i => i !== index);
     } else {
       if (selectedHandIndices.length < 2) selectedHandIndices.push(index);
       else selectedHandIndices = [selectedHandIndices[1], index];
     }
-  } else if (isC10) {
-    if (selectedHandIndices.includes(index)) selectedHandIndices = selectedHandIndices.filter(i => i !== index);
-    else if (selectedHandIndices.length < 2) selectedHandIndices.push(index);
   } else if (isC11) {
     const targetId = getTargetTeamId();
     const quota = gameState.teams[targetId].completedMissions.length + 1;
@@ -1545,6 +1583,18 @@ function clientToggleHandCard(index) {
   renderHand();
   renderActiveMissionSlots();
   updateActionButtons();
+  // Ensure dashboard reactively updates selected chips in Crisis 10 & 11!
+  renderCrisisInteractiveButtons();
+}
+
+function clientToggleTargetCard(index) {
+  if (selectedTargetHandIndices.includes(index)) {
+    selectedTargetHandIndices = selectedTargetHandIndices.filter(i => i !== index);
+  } else {
+    if (selectedTargetHandIndices.length < 2) selectedTargetHandIndices.push(index);
+    else selectedTargetHandIndices = [selectedTargetHandIndices[1], index];
+  }
+  renderCrisisInteractiveButtons();
 }
 
 function clientClickActiveSlot(slotIndex) {
@@ -1567,7 +1617,7 @@ function clientClickActiveSlot(slotIndex) {
   const requiredCount = isC8 ? 2 : 1;
 
   if (selectedHandIndices.length !== requiredCount) {
-    alert(isC8 ? "Crisis 8 is active! You must select 2 MATCHING cards from your hand." : "Select a matching resource card from hand first.");
+    alert(isC8 ? "Crisis 8 is active! Select 2 MATCHING cards from hand." : "Select a matching resource card from hand first.");
     return;
   }
 
@@ -1640,7 +1690,6 @@ function clientResolveCrisisAction(actionType, extraData = {}) {
       break;
     }
 
-    // Crisis 4: Gain 2 Innovation Cards Strictly
     case 'crisis4_gain_inno': {
       clientSendAction({
         type: 'CRISIS_FULFILLED', teamId: targetId,
@@ -1650,7 +1699,6 @@ function clientResolveCrisisAction(actionType, extraData = {}) {
       break;
     }
 
-    // Crisis 4: Wipe Current Mission Progress (Uncross Tracker completely)
     case 'crisis4_wipe_progress': {
       t.activeMissionFilledSlots = [];
       renderBoardroomView();
@@ -1683,7 +1731,6 @@ function clientResolveCrisisAction(actionType, extraData = {}) {
       break;
     }
 
-    // Crisis 6: Train Team (Discard 2 Budget -> Gain 2 Innovation)
     case 'crisis6_train': {
       if (countCard('BUDGET') < 2) return;
       clientSendAction({
@@ -1695,7 +1742,6 @@ function clientResolveCrisisAction(actionType, extraData = {}) {
       break;
     }
 
-    // Crisis 6: Hire Externally (Discard 1 B, 1 D, 1 I, 1 C -> +1 Progress Unit)
     case 'crisis6_hire': {
       if (countCard('BUDGET') < 1 || countCard('DATA') < 1 || countCard('INNOVATION') < 1 || countCard('COMPLIANCE') < 1) return;
       clientSendAction({
@@ -1748,10 +1794,13 @@ function clientResolveCrisisAction(actionType, extraData = {}) {
       clientSendAction({
         type: 'CRISIS_FULFILLED', teamId: targetId,
         action: 'crisis10_swap',
-        detail: 'Resource Snipe swap executed',
+        targetTeamId: extraData.targetTeamId,
+        detail: `Executed forced 2-card swap with Team ${extraData.targetTeamId}`,
         myCards: extraData.myCards,
         theirCards: extraData.theirCards
       });
+      selectedHandIndices = [];
+      selectedTargetHandIndices = [];
       break;
     }
 
@@ -1777,12 +1826,12 @@ function clientResolveCrisisAction(actionType, extraData = {}) {
     }
 
     case 'crisis12_draw_others': {
-      for (let i = 1; i <= 4; i++) {
+      getActiveTeamIds().forEach(i => {
         if (i !== targetId) drawCardsForTeam(i, 2);
-      }
+      });
       clientSendAction({
         type: 'CRISIS_FULFILLED', teamId: targetId,
-        detail: 'Allowed all other teams to draw 2 resource cards'
+        detail: 'Allowed all other active teams to draw 2 resource cards'
       });
       break;
     }
@@ -1851,6 +1900,7 @@ function renderUI() {
   const facTotal = Object.values(gameState.facilitatorPool).reduce((a,b)=>a+b, 0);
   document.getElementById('deck-fac-count').innerText = facTotal;
 
+  // Turn Spotlight Banner
   const turnBar = document.getElementById('turn-spotlight-bar');
   const activeT = gameState.teams[gameState.activeTurnTeamId];
   if (gameState.phase === 'CRISIS') {
@@ -1870,9 +1920,25 @@ function renderUI() {
     }
   }
 
+  // Update Facilitator toggle buttons (highlight active turn)
   for (let id = 1; id <= 4; id++) {
     const btn = document.getElementById(`btn-turn-t${id}`);
     if (btn) btn.className = (id === gameState.activeTurnTeamId) ? 'btn-cyan' : '';
+  }
+
+  // Update Undo Buttons List in Sidebar
+  const undoList = document.getElementById('undo-buttons-list');
+  if (undoList) {
+    undoList.innerHTML = "";
+    getActiveTeamIds().forEach(id => {
+      const row = document.createElement('div');
+      row.className = "undo-bar";
+      row.innerHTML = `
+        <span style="font-size: 0.85rem;">Team ${id} (${gameState.teams[id].name.split(' ')[0]})</span>
+        <button class="btn-red" style="padding: 4px 10px; font-size: 0.75rem;" onclick="hostUndoTeamAction(${id})">Undo T${id}</button>
+      `;
+      undoList.appendChild(row);
+    });
   }
 
   const winBanner = document.getElementById('winner-display');
@@ -2053,27 +2119,63 @@ function renderCrisisInteractiveButtons() {
       </button>
     `;
   }
+  // Crisis 10: Interactive Forced 2-for-2 Swap with Next Active Team
   else if (crisisId === 10) {
-    const nextId = (targetId % 4) + 1;
+    const nextId = getNextActiveTeamId(targetId);
+    if (!nextId) {
+      btnContainer.innerHTML = `
+        <span style="color:#34d399;">No other active team with players found. Crisis bypassed.</span>
+        <button class="btn-cyan" onclick="clientResolveCrisisAction('cannot_fulfill')">Proceed</button>
+      `;
+      return;
+    }
+
     const nextTeam = gameState.teams[nextId];
     const mySelected = selectedHandIndices.map(i => t.hand[i]);
+    const theirSelected = selectedTargetHandIndices.map(i => nextTeam.hand[i]);
+
+    let targetCardsHtml = `<div style="display:flex; flex-wrap:wrap; gap:6px; margin:8px 0;">`;
+    nextTeam.hand.forEach((card, idx) => {
+      const isSel = selectedTargetHandIndices.includes(idx);
+      targetCardsHtml += `
+        <div class="res-chip ${isSel ? 'selected' : ''}" onclick="clientToggleTargetCard(${idx})">
+          ${card} ${isSel ? '✓' : ''}
+        </div>
+      `;
+    });
+    targetCardsHtml += `</div>`;
+
+    const canSwap = (selectedHandIndices.length === 2 && selectedTargetHandIndices.length === 2);
+
     btnContainer.innerHTML = `
       <div style="width: 100%; text-align: left; font-size: 0.85rem;">
-        <div>Select 2 cards from your hand below (Selected: ${mySelected.join(', ') || 'None'})</div>
-        <div style="margin-top: 6px;">Next Team (${nextTeam.name}) Hand: <strong>${nextTeam.hand.join(', ') || 'Empty'}</strong></div>
+        <div style="margin-bottom:6px;">
+          <strong>Step 1:</strong> Select 2 cards from YOUR hand below: 
+          <span style="color:var(--accent-cyan); font-weight:bold;">${mySelected.join(', ') || 'None selected (0/2)'}</span>
+        </div>
+        <div style="border-top:1px solid #334155; padding-top:6px;">
+          <strong>Step 2:</strong> Tap 2 cards to take from <strong>Team ${nextId} (${nextTeam.name})</strong>:
+          ${targetCardsHtml}
+          Selected from Team ${nextId}: <span style="color:var(--accent-gold); font-weight:bold;">${theirSelected.join(', ') || 'None selected (0/2)'}</span>
+        </div>
       </div>
-      <button class="btn-cyan" ${mySelected.length !== 2 || nextTeam.hand.length < 2 ? 'disabled' : ''} onclick="promptCrisis10Swap(${targetId}, ${nextId})">
-        Execute 2-Card Swap with Team ${nextId}
+      <button class="btn-gold" style="margin-top:8px;" ${!canSwap ? 'disabled' : ''} onclick="executeCrisis10Swap(${targetId}, ${nextId})">
+        Execute Forced 2-for-2 Swap (Immediate Hand Update)
       </button>
     `;
   }
+  // Crisis 11: The Great Resignation (Reactivity Fixed)
   else if (crisisId === 11) {
     const quota = t.completedMissions.length + 1;
     const mySelected = selectedHandIndices.map(i => t.hand[i]);
     const canDiscard = (mySelected.length === quota);
+
     btnContainer.innerHTML = `
       <div style="width: 100%; text-align: left; font-size: 0.85rem; margin-bottom: 6px;">
-        Completed Missions: ${t.completedMissions.length} -> Must select and discard <strong>${quota}</strong> card(s). (Selected: ${mySelected.length}/${quota})
+        <div>Completed Missions: <strong>${t.completedMissions.length}</strong> -> Requirement: Select and discard <strong>${quota}</strong> card(s).</div>
+        <div style="margin-top:6px; color:var(--accent-gold);">
+          Selected to Discard: <strong>${mySelected.join(', ') || 'None (Click cards in hand below)'}</strong> (${mySelected.length}/${quota})
+        </div>
       </div>
       <button class="btn-red" ${!canDiscard ? 'disabled' : ''} onclick="clientResolveCrisisAction('crisis11_discard')">
         Discard ${quota} Selected Card(s)
@@ -2083,12 +2185,12 @@ function renderCrisisInteractiveButtons() {
   else if (crisisId === 12) {
     let maxProg = -1;
     let leaders = [];
-    for (let id = 1; id <= 4; id++) {
+    getActiveTeamIds().forEach(id => {
       const tm = gameState.teams[id];
       const prog = (tm.completedMissions.length * 10) + tm.activeMissionFilledSlots.length;
       if (prog > maxProg) { maxProg = prog; leaders = [id]; }
       else if (prog === maxProg) { leaders.push(id); }
-    }
+    });
 
     if (leaders.includes(targetId)) {
       const has3C = countCard('COMPLIANCE') >= 3;
@@ -2098,7 +2200,7 @@ function renderCrisisInteractiveButtons() {
           Discard 3 Compliance Cards ${!has3C ? '(Need 3 Compliance)' : ''}
         </button>
         <button class="btn-gold" onclick="clientResolveCrisisAction('crisis12_draw_others')">
-          Cannot Discard: All Other Teams Draw 2 Cards
+          Cannot Discard: All Other Active Teams Draw 2 Cards
         </button>
       `;
     } else {
@@ -2137,21 +2239,22 @@ function renderCrisisInteractiveButtons() {
   }
 }
 
-function promptCrisis10Swap(myId, theirId) {
+function executeCrisis10Swap(myId, targetId) {
   const t = gameState.teams[myId];
-  const nextTeam = gameState.teams[theirId];
+  const nextTeam = gameState.teams[targetId];
   const myCards = selectedHandIndices.map(i => t.hand[i]);
-  if (myCards.length !== 2) return;
+  const theirCards = selectedTargetHandIndices.map(i => nextTeam.hand[i]);
 
-  const pick1 = prompt(`Select 1st card to take from Team ${theirId} (${nextTeam.hand.join(', ')}):`);
-  const pick2 = prompt(`Select 2nd card to take from Team ${theirId} (${nextTeam.hand.join(', ')}):`);
+  if (myCards.length !== 2 || theirCards.length !== 2) {
+    alert("Please select exactly 2 cards from your hand and 2 cards from target team's hand!");
+    return;
+  }
 
-  if (!pick1 || !pick2) return;
   clientResolveCrisisAction('crisis10_swap', {
+    targetTeamId: targetId,
     myCards: myCards,
-    theirCards: [pick1.toUpperCase(), pick2.toUpperCase()]
+    theirCards: theirCards
   });
-  selectedHandIndices = [];
 }
 
 function submitCrisis14Bid(teamId, maxB) {
@@ -2305,11 +2408,15 @@ function updateActionButtons() {
   btnDraw.disabled = isDrawBlocked || (gameState.drawDeck.length === 0 && gameState.discardDeck.length === 0);
 }
 
+// RENDER ACTIVE CREATED TEAMS (Up to 4)
 function renderAllTeamsGrid() {
   const grid = document.getElementById('all-teams-grid');
   grid.innerHTML = "";
 
-  for (let id = 1; id <= 4; id++) {
+  const activeIds = getActiveTeamIds();
+  document.getElementById('active-teams-count-badge').innerText = `${activeIds.length} Team(s) Active`;
+
+  activeIds.forEach(id => {
     const t = gameState.teams[id];
     const card = document.createElement('div');
     const isTurn = (id === gameState.activeTurnTeamId);
@@ -2347,7 +2454,7 @@ function renderAllTeamsGrid() {
 
     const membersDisplay = (t.members && t.members.length > 0) 
       ? t.members.join(', ') 
-      : '<span style="color:#64748b; font-style:italic;">None</span>';
+      : '<span style="color:#64748b; font-style:italic;">Solo / Simulated</span>';
 
     card.innerHTML = `
       <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -2365,7 +2472,7 @@ function renderAllTeamsGrid() {
       ${slotsHtml}
     `;
     grid.appendChild(card);
-  }
+  });
 }
 </script>
 </body>
