@@ -167,6 +167,23 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
 .phase-action { color: var(--accent-cyan); border-color: var(--accent-cyan); box-shadow: 0 0 10px rgba(6, 182, 212, 0.4); }
 .phase-crisis { color: var(--accent-red); border-color: var(--accent-red); box-shadow: 0 0 12px rgba(239, 68, 68, 0.5); }
 
+/* Spotlight Turn Banner */
+.turn-spotlight-bar {
+  background: linear-gradient(90deg, #1e293b, #0f172a);
+  border: 2px solid var(--accent-cyan);
+  border-radius: 10px;
+  padding: 12px 20px;
+  margin-bottom: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 0 15px rgba(6, 182, 212, 0.25);
+}
+.turn-spotlight-bar.crisis-turn {
+  border-color: var(--accent-red);
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.35);
+}
+
 .game-container {
   max-width: 1440px;
   margin: 0 auto;
@@ -370,7 +387,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
     <!-- FACILITATOR HOST FORM -->
     <div id="lobby-host-section" style="display: none;">
       <p style="color: #cbd5e1; font-size: 0.9rem; margin-bottom: 15px;">
-        Launch the live master game room. Facilitator advances Action/Crisis phases, reviews team actions in real time, and can undo misclicks.
+        Launch master room. Facilitator steps through each team's turn, reviews crisis decisions, and manages pacing.
       </p>
       <button class="btn-gold" style="width: 100%; padding: 14px;" onclick="startHostGame()">LAUNCH NEW GAME ROOM</button>
       <div id="host-status" style="margin-top: 10px; font-size: 0.85rem; color: var(--accent-gold);"></div>
@@ -397,7 +414,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
       <span id="my-identity-tag" class="badge badge-innovation" style="margin-left: 6px;">Spectator</span>
     </div>
 
-    <!-- Simulator Switcher (Visible in Solo mode) -->
+    <!-- Simulator Switcher (Solo mode) -->
     <div id="dev-team-switcher" style="display: none; align-items: center; gap: 6px;">
       <span style="font-size: 0.8rem; color: #94a3b8;">Simulate:</span>
       <button style="padding: 4px 8px; font-size: 0.75rem;" onclick="switchSimulatedTeam(1)">T1</button>
@@ -414,6 +431,15 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
 
   <div class="game-container">
     <div>
+      <!-- Turn Spotlight Banner (Synced for Facilitator & Classroom) -->
+      <div id="turn-spotlight-bar" class="turn-spotlight-bar">
+        <div>
+          <span style="font-size: 0.8rem; color: #94a3b8; font-weight: bold; display: block;">CURRENT TURN IN PROGRESS</span>
+          <h2 id="turn-spotlight-title" style="font-size: 1.35rem; color: var(--accent-cyan);">TEAM 1: Alpha Cyber Vanguard</h2>
+        </div>
+        <div id="turn-spotlight-status" class="badge badge-budget" style="font-size: 0.85rem;">Awaiting Action</div>
+      </div>
+
       <!-- WINNER ANNOUNCEMENT BANNER -->
       <div id="winner-display" class="winner-banner" style="display: none;">
         <h2 style="font-size: 1.8rem; margin-bottom: 6px; color: #fef08a;">🏆 GALAXY GOVERNANCE CHAMPION: <span id="winner-team-name">TEAM 1</span></h2>
@@ -434,8 +460,11 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
 
         <!-- Student Interactive Crisis Resolution Options -->
         <div id="crisis-team-options" class="crisis-resolution-box">
-          <h4 style="color: #fca5a5; margin-bottom: 8px;">YOUR TEAM'S CRISIS ACTION:</h4>
+          <h4 id="crisis-options-header" style="color: #fca5a5; margin-bottom: 8px;">TEAM CRISIS DECISION:</h4>
           <div id="crisis-action-buttons" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
+          <div id="crisis-waiting-note" style="display: none; color: #94a3b8; font-style: italic; margin-top: 8px;">
+            ⏳ Waiting for Facilitator to cycle to your team's crisis turn...
+          </div>
           <div id="crisis-resolved-note" style="display: none; color: #34d399; font-weight: bold; margin-top: 8px;">
             ✓ Your team has finalized its crisis action for this phase.
           </div>
@@ -444,7 +473,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
 
       <!-- Turn Skip Notice Banner -->
       <div id="skip-turn-banner" style="display: none; background: #7f1d1d; border: 1px solid #ef4444; border-radius: 8px; padding: 12px; margin-bottom: 15px; color: #fecaca; font-weight: bold;">
-        ⚠️ ACTION TURN SKIPPED: Your team did not resolve the prior crisis and must sit out this Action Phase!
+        ⚠️ ACTION TURN SKIPPED: Your team failed to resolve the prior crisis and must sit out this Action Phase!
       </div>
 
       <!-- ACTIVE TEAM DASHBOARD -->
@@ -454,6 +483,11 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
           <div>Score: <strong id="my-team-points" style="color: var(--accent-gold); font-size: 1.3rem;">0</strong> PTS</div>
         </div>
 
+        <!-- Turn Wait Notice for Inactive Teams -->
+        <div id="turn-wait-banner" style="display: none; background: #1e293b; border: 1px dashed var(--accent-cyan); border-radius: 8px; padding: 10px; margin: 12px 0; color: #38bdf8; font-size: 0.9rem;">
+          ⏳ <strong>WAITING FOR YOUR TURN:</strong> Facilitator has spotlighted <span id="turn-wait-team-name">Team 1</span>. Discuss your strategy while waiting!
+        </div>
+
         <!-- Mission Picker (When no mission is active) -->
         <div id="mission-select-container" style="margin: 15px 0; background: #090e17; padding: 15px; border-radius: 10px; border: 1px dashed #06b6d4; display: none;">
           <h4 style="color: var(--accent-cyan); margin-bottom: 6px;">SELECT YOUR NEXT MISSION TO FOCUS ON:</h4>
@@ -461,7 +495,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
           <div id="available-mission-buttons" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
         </div>
 
-        <!-- CURRENT ACTIVE MISSION BOARD (ONE MISSION AT A TIME, NON-SEQUENTIAL SLOTS) -->
+        <!-- CURRENT ACTIVE MISSION BOARD -->
         <div id="active-mission-container" style="background: #090e17; border: 1px solid #334155; border-radius: 10px; padding: 16px; margin: 15px 0; display: none;">
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <div>
@@ -485,15 +519,17 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
         <div style="margin-top: 20px;">
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <h4>Resource Cards in Hand (<span id="hand-count">0</span>)</h4>
-            <span style="font-size: 0.85rem; color: #94a3b8;">1. Select card → 2. Tap highlighted slot above</span>
+            <span style="font-size: 0.85rem; color: #94a3b8;">1. Select card → 2. Tap highlighted slot above (or Discard during Crisis)</span>
           </div>
           <div id="my-hand-cards" class="hand-container"></div>
         </div>
 
-        <!-- Action Controls: AUTOMATIC DRAW (Deck first, then Discard seamlessly) -->
+        <!-- Action Controls: Discard is greyed out during Action Phase, only active during Crisis Phase -->
         <div id="player-action-controls" style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
           <button class="btn-gold" id="btn-draw-resources" onclick="clientDrawResources()">Draw 2 Resource Cards</button>
-          <button class="btn-red" id="btn-discard-card" onclick="clientDiscardCard()" disabled>Discard Selected Card</button>
+          <button class="btn-red" id="btn-discard-card" onclick="clientDiscardCard()" disabled title="Discarding is only permitted during Crisis Phase">
+            Discard Selected Card (Crisis Only)
+          </button>
         </div>
       </div>
 
@@ -502,7 +538,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
       <div id="all-teams-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 10px;"></div>
     </div>
 
-    <!-- SIDEBAR: DECKS, UNDO BUTTONS, & FACILITATOR LOG -->
+    <!-- SIDEBAR: DECKS, TURN CYCLING, & FACILITATOR CONTROLS -->
     <div>
       <div style="background: var(--bg-panel); border-radius: 12px; padding: 18px; border: 1px solid #334155; margin-bottom: 20px;">
         <h4>CENTRAL DECKS</h4>
@@ -525,6 +561,21 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
       <!-- Facilitator Control Panel -->
       <div id="host-controls-panel" class="host-panel" style="display: none;">
         <h4 style="color: var(--accent-gold); margin-bottom: 12px;">FACILITATOR CONTROLS</h4>
+        
+        <!-- TURN PACING & CYCLING CONTROLS -->
+        <div style="background: #090e17; padding: 10px; border-radius: 8px; border: 1px solid var(--accent-cyan); margin-bottom: 12px;">
+          <span style="font-size: 0.8rem; color: #94a3b8; font-weight: bold;">STEP TURN TO TEAM:</span>
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-top: 6px;">
+            <button id="btn-turn-t1" style="padding: 6px 2px; font-size: 0.75rem;" onclick="hostSetTurn(1)">T1</button>
+            <button id="btn-turn-t2" style="padding: 6px 2px; font-size: 0.75rem;" onclick="hostSetTurn(2)">T2</button>
+            <button id="btn-turn-t3" style="padding: 6px 2px; font-size: 0.75rem;" onclick="hostSetTurn(3)">T3</button>
+            <button id="btn-turn-t4" style="padding: 6px 2px; font-size: 0.75rem;" onclick="hostSetTurn(4)">T4</button>
+          </div>
+          <button class="btn-cyan" style="width: 100%; margin-top: 8px; padding: 8px;" onclick="hostCycleNextTurn()">
+            Next Team's Turn ⏭️
+          </button>
+        </div>
+
         <div style="display: flex; flex-direction: column; gap: 10px;">
           <button class="btn-cyan" onclick="hostNextPhase()">
             Cycle Phase: <span id="host-btn-phase-label">Start Crisis Phase</span>
@@ -656,12 +707,13 @@ let myTeamId = 1;
 let myPlayerName = "Board Member";
 let selectedCardIndex = null;
 
-// Stack of state history per team for Facilitator Undo
+// State history for Facilitator Undo
 let teamActionHistory = { 1: [], 2: [], 3: [], 4: [] };
 
 let gameState = {
   roomCode: "",
   phase: "ACTION",
+  activeTurnTeamId: 1, // Facilitator Turn Cycling (1 to 4)
   currentCrisisIndex: 0,
   activeCrisis: null,
   drawDeck: [],
@@ -679,7 +731,7 @@ let gameState = {
 function createDefaultTeamState(name) {
   return {
     name: name,
-    members: [], // Facilitator can see all team member names
+    members: [],
     points: 0,
     hand: [],
     actionTakenThisRound: false,
@@ -800,11 +852,10 @@ function initMainDeck() {
   gameState.discardDeck = [];
 }
 
-// AUTOMATIC SEAMLESS DRAW: Main Deck first -> If depleted, automatically draw from Discard Pile
+// AUTOMATIC SEAMLESS DRAW: Draw Deck first -> Discard Pile automatically
 function drawCardsForTeam(teamId, count) {
   const team = gameState.teams[teamId];
   for (let i = 0; i < count; i++) {
-    // If main draw deck runs out, automatically recycle and shuffle discard pile into draw deck
     if (gameState.drawDeck.length === 0) {
       if (gameState.discardDeck.length > 0) {
         gameState.drawDeck = [...gameState.discardDeck];
@@ -814,7 +865,7 @@ function drawCardsForTeam(teamId, count) {
           [gameState.drawDeck[j], gameState.drawDeck[k]] = [gameState.drawDeck[k], gameState.drawDeck[j]];
         }
       } else {
-        break; // Both decks completely exhausted
+        break;
       }
     }
     if (gameState.drawDeck.length > 0) {
@@ -923,7 +974,6 @@ function joinAsStudent() {
       }
     });
 
-    // Send member name to Host
     mqttClient.publish(topicAction, JSON.stringify({ type: 'PLAYER_JOIN', teamId: myTeamId, name: myPlayerName }));
 
     document.getElementById('view-lobby').style.display = 'none';
@@ -984,7 +1034,6 @@ function handleHostReceiveData(data) {
 
           showFacilitatorToast(`🎯 Team ${data.teamId} played ${playedCard} to ${mission.name}!`, 'success');
 
-          // Check if current mission is fully completed
           if (t.activeMissionFilledSlots.length === allSlots.length) {
             t.points += mission.value;
             t.completedMissions.push(t.activeMissionKey);
@@ -1014,12 +1063,13 @@ function handleHostReceiveData(data) {
       broadcastGameState();
       break;
 
+    // DISCARD ACTION: Only permitted during Crisis Phase
     case 'ACTION_DISCARD':
-      snapshotTeamState(data.teamId, 'Discarded Card');
+      snapshotTeamState(data.teamId, 'Discarded Card during Crisis');
       if (data.cardIndex !== null && data.cardIndex < t.hand.length) {
         const discarded = t.hand.splice(data.cardIndex, 1)[0];
         gameState.discardDeck.push(discarded);
-        showFacilitatorToast(`🗑️ Team ${data.teamId} discarded 1 card`);
+        showFacilitatorToast(`🗑️ Team ${data.teamId} discarded 1 ${discarded} card during Crisis`);
         broadcastGameState();
       }
       break;
@@ -1065,63 +1115,32 @@ function switchSimulatedTeam(teamId) {
 }
 
 /* =========================================================================
-   WINNER EVALUATION ENGINE (OFFICIAL RULES & TIEBREAKERS)
+   FACILITATOR TURN PACING & CYCLING CONTROLS
    ========================================================================= */
 
-function hostEvaluateWinner() {
-  let teamsArr = [];
-  for (let id = 1; id <= 4; id++) {
-    const t = gameState.teams[id];
-    let curMissionVal = 0;
-    if (t.activeMissionKey) curMissionVal = MISSION_SPECS[t.activeMissionKey].value;
-
-    teamsArr.push({
-      id: id,
-      name: t.name,
-      completedCount: t.completedMissions.length,
-      points: t.points,
-      resourcesInHand: t.hand.length,
-      currentProgressUnits: t.activeMissionFilledSlots.length,
-      currentMissionValue: curMissionVal
-    });
-  }
-
-  teamsArr.sort((a, b) => {
-    if (b.completedCount === 3 || a.completedCount === 3) {
-      if (b.completedCount !== a.completedCount) return b.completedCount - a.completedCount;
-    }
-    if (b.points !== a.points) return b.points - a.points;
-    if (b.resourcesInHand !== a.resourcesInHand) return b.resourcesInHand - a.resourcesInHand;
-    if (b.currentProgressUnits !== a.currentProgressUnits) return b.currentProgressUnits - a.currentProgressUnits;
-    if (b.currentMissionValue !== a.currentMissionValue) return b.currentMissionValue - a.currentMissionValue;
-    return b.resourcesInHand - a.resourcesInHand;
-  });
-
-  const winner = teamsArr[0];
-  gameState.winnerDeclared = {
-    id: winner.id,
-    name: winner.name,
-    points: winner.points,
-    completed: winner.completedCount,
-    hand: winner.resourcesInHand,
-    progress: winner.currentProgressUnits
-  };
-
-  showFacilitatorToast(`🏆 GAME OVER! Team ${winner.id} (${winner.name}) WINS GALAXY GOVERNANCE!`, 'gold');
+function hostSetTurn(teamId) {
+  if (!isHost) return;
+  gameState.activeTurnTeamId = teamId;
+  showFacilitatorToast(`👉 Paced turn to Team ${teamId} (${gameState.teams[teamId].name})`);
   broadcastGameState();
 }
 
-/* =========================================================================
-   HOST FACILITATOR CONTROLS
-   ========================================================================= */
+function hostCycleNextTurn() {
+  if (!isHost) return;
+  let next = gameState.activeTurnTeamId + 1;
+  if (next > 4) next = 1;
+  hostSetTurn(next);
+}
 
 function hostNextPhase() {
   if (gameState.phase === 'ACTION') {
     gameState.phase = 'CRISIS';
+    gameState.activeTurnTeamId = 1; // Start crisis review with Team 1
     document.getElementById('host-btn-phase-label').innerText = 'Start Action Phase';
-    showFacilitatorToast(`🚨 CRISIS PHASE INITIATED! Teams must resolve the crisis.`, 'alert');
+    showFacilitatorToast(`🚨 CRISIS PHASE INITIATED! Cycling begins with Team 1.`, 'alert');
   } else {
     gameState.phase = 'ACTION';
+    gameState.activeTurnTeamId = 1; // Start action phase with Team 1
     document.getElementById('host-btn-phase-label').innerText = 'Start Crisis Phase';
 
     for (let id in gameState.teams) {
@@ -1129,7 +1148,7 @@ function hostNextPhase() {
       tm.actionTakenThisRound = false;
       tm.crisisResolvedThisPhase = false;
       if (tm.skipNextAction) {
-        showFacilitatorToast(`🚫 Team ${id}'s action turn is SKIPPED due to unfulfilled crisis!`, 'alert');
+        showFacilitatorToast(`🚫 Team ${id}'s turn will be SKIPPED due to unfulfilled crisis!`, 'alert');
       }
     }
   }
@@ -1145,6 +1164,7 @@ function hostTriggerNextCrisis() {
   gameState.activeCrisis = crisis;
   gameState.currentCrisisIndex++;
   gameState.phase = 'CRISIS';
+  gameState.activeTurnTeamId = 1; // Reset to Team 1 for review
 
   for (let id in gameState.teams) {
     gameState.teams[id].crisisResolvedThisPhase = false;
@@ -1158,7 +1178,7 @@ function hostTriggerNextCrisis() {
     }
   }
 
-  showFacilitatorToast(`⚠️ Crisis #${crisis.id}: "${crisis.name}" drawn!`, 'alert');
+  showFacilitatorToast(`⚠️ Crisis #${crisis.id}: "${crisis.name}" drawn! Beginning turn cycle.`, 'alert');
   broadcastGameState();
 }
 
@@ -1211,6 +1231,53 @@ function toggleProjectorView() {
 }
 
 /* =========================================================================
+   WINNER EVALUATION ENGINE (OFFICIAL RULES & TIEBREAKERS)
+   ========================================================================= */
+
+function hostEvaluateWinner() {
+  let teamsArr = [];
+  for (let id = 1; id <= 4; id++) {
+    const t = gameState.teams[id];
+    let curMissionVal = 0;
+    if (t.activeMissionKey) curMissionVal = MISSION_SPECS[t.activeMissionKey].value;
+
+    teamsArr.push({
+      id: id,
+      name: t.name,
+      completedCount: t.completedMissions.length,
+      points: t.points,
+      resourcesInHand: t.hand.length,
+      currentProgressUnits: t.activeMissionFilledSlots.length,
+      currentMissionValue: curMissionVal
+    });
+  }
+
+  teamsArr.sort((a, b) => {
+    if (b.completedCount === 3 || a.completedCount === 3) {
+      if (b.completedCount !== a.completedCount) return b.completedCount - a.completedCount;
+    }
+    if (b.points !== a.points) return b.points - a.points;
+    if (b.resourcesInHand !== a.resourcesInHand) return b.resourcesInHand - a.resourcesInHand;
+    if (b.currentProgressUnits !== a.currentProgressUnits) return b.currentProgressUnits - a.currentProgressUnits;
+    if (b.currentMissionValue !== a.currentMissionValue) return b.currentMissionValue - a.currentMissionValue;
+    return b.resourcesInHand - a.resourcesInHand;
+  });
+
+  const winner = teamsArr[0];
+  gameState.winnerDeclared = {
+    id: winner.id,
+    name: winner.name,
+    points: winner.points,
+    completed: winner.completedCount,
+    hand: winner.resourcesInHand,
+    progress: winner.currentProgressUnits
+  };
+
+  showFacilitatorToast(`🏆 GAME OVER! Team ${winner.id} (${winner.name}) WINS GALAXY GOVERNANCE!`, 'gold');
+  broadcastGameState();
+}
+
+/* =========================================================================
    CLIENT ACTIONS & INTERACTIVE CRISES
    ========================================================================= */
 
@@ -1235,6 +1302,10 @@ function clientSelectCard(index) {
 }
 
 function clientClickActiveSlot(slotIndex) {
+  if (myTeamId !== gameState.activeTurnTeamId && !isHost && !isSolo) {
+    alert("It is not your team's turn yet!");
+    return;
+  }
   if (selectedCardIndex === null) {
     alert("Select a resource card from your hand first, then click this slot to fill it!");
     return;
@@ -1268,8 +1339,11 @@ function clientClickActiveSlot(slotIndex) {
   selectedCardIndex = null;
 }
 
-// Draw from Deck (automatically transitions to Discard when depleted)
 function clientDrawResources() {
+  if (myTeamId !== gameState.activeTurnTeamId && !isHost && !isSolo) {
+    alert("It is not your team's turn yet!");
+    return;
+  }
   const t = gameState.teams[myTeamId];
   if (t.skipNextAction && gameState.phase === 'ACTION') {
     alert("Turn skipped due to crisis penalty!");
@@ -1278,13 +1352,22 @@ function clientDrawResources() {
   clientSendAction({ type: 'ACTION_DRAW', teamId: myTeamId });
 }
 
+// Discard only permitted during Crisis Phase
 function clientDiscardCard() {
+  if (gameState.phase !== 'CRISIS') {
+    alert("Discarding is only permitted during the Crisis Phase to resolve crisis penalties.");
+    return;
+  }
   if (selectedCardIndex === null) return;
   clientSendAction({ type: 'ACTION_DISCARD', teamId: myTeamId, cardIndex: selectedCardIndex });
   selectedCardIndex = null;
 }
 
 function clientResolveCrisisAction(actionType) {
+  if (myTeamId !== gameState.activeTurnTeamId && !isHost && !isSolo) {
+    alert("It is not your team's turn to resolve the crisis yet!");
+    return;
+  }
   const t = gameState.teams[myTeamId];
   const crisis = gameState.activeCrisis;
   if (!crisis) return;
@@ -1294,7 +1377,7 @@ function clientResolveCrisisAction(actionType) {
       let bIndices = [];
       t.hand.forEach((c, idx) => { if (c === 'BUDGET') bIndices.push(idx); });
       if (bIndices.length < 2) {
-        alert("You do not have 2 Budget cards in hand!");
+        alert("You do not have 2 Budget cards in hand! You must choose 'Cannot Fulfil'.");
         return;
       }
       clientSendAction({ type: 'ACTION_DISCARD', teamId: myTeamId, cardIndex: bIndices[1] });
@@ -1342,6 +1425,34 @@ function renderUI() {
   const facTotal = Object.values(gameState.facilitatorPool).reduce((a,b)=>a+b, 0);
   document.getElementById('deck-fac-count').innerText = facTotal;
 
+  // Render Turn Spotlight Banner
+  const turnBar = document.getElementById('turn-spotlight-bar');
+  const activeT = gameState.teams[gameState.activeTurnTeamId];
+  if (gameState.phase === 'CRISIS') {
+    turnBar.className = 'turn-spotlight-bar crisis-turn';
+    document.getElementById('turn-spotlight-title').innerText = `CRISIS TURN: Team ${gameState.activeTurnTeamId} (${activeT.name})`;
+    document.getElementById('turn-spotlight-status').innerText = activeT.crisisResolvedThisPhase ? "Resolved ✓" : "Reviewing Crisis...";
+    document.getElementById('turn-spotlight-status').className = activeT.crisisResolvedThisPhase ? "badge badge-compliance" : "badge badge-budget";
+  } else {
+    turnBar.className = 'turn-spotlight-bar';
+    document.getElementById('turn-spotlight-title').innerText = `ACTION TURN: Team ${gameState.activeTurnTeamId} (${activeT.name})`;
+    if (activeT.skipNextAction) {
+      document.getElementById('turn-spotlight-status').innerText = "TURN SKIPPED (Penalty)";
+      document.getElementById('turn-spotlight-status').className = "badge badge-budget";
+    } else {
+      document.getElementById('turn-spotlight-status').innerText = activeT.actionTakenThisRound ? "Action Completed ✓" : "Choosing Action...";
+      document.getElementById('turn-spotlight-status').className = activeT.actionTakenThisRound ? "badge badge-compliance" : "badge badge-data";
+    }
+  }
+
+  // Highlight active turn button on Facilitator panel
+  for (let id = 1; id <= 4; id++) {
+    const btn = document.getElementById(`btn-turn-t${id}`);
+    if (btn) {
+      btn.className = (id === gameState.activeTurnTeamId) ? 'btn-cyan' : '';
+    }
+  }
+
   // Winner Banner
   const winBanner = document.getElementById('winner-display');
   if (gameState.winnerDeclared) {
@@ -1375,18 +1486,32 @@ function renderUI() {
 }
 
 function renderCrisisInteractiveButtons() {
+  const isMyTurnInCrisis = (myTeamId === gameState.activeTurnTeamId);
   const t = gameState.teams[myTeamId];
   const btnContainer = document.getElementById('crisis-action-buttons');
   const note = document.getElementById('crisis-resolved-note');
+  const waitNote = document.getElementById('crisis-waiting-note');
+  const header = document.getElementById('crisis-options-header');
   btnContainer.innerHTML = "";
 
   if (t.crisisResolvedThisPhase) {
     note.style.display = 'block';
+    waitNote.style.display = 'none';
     btnContainer.style.display = 'none';
     return;
   }
 
+  if (!isMyTurnInCrisis && !isHost && !isSolo) {
+    note.style.display = 'none';
+    waitNote.style.display = 'block';
+    btnContainer.style.display = 'none';
+    header.innerText = `WAITING FOR TEAM ${gameState.activeTurnTeamId}'S CRISIS DECISION...`;
+    return;
+  }
+
+  header.innerText = `YOUR TEAM'S CRISIS ACTION:`;
   note.style.display = 'none';
+  waitNote.style.display = 'none';
   btnContainer.style.display = 'flex';
 
   const crisisId = gameState.activeCrisis.id;
@@ -1394,17 +1519,18 @@ function renderCrisisInteractiveButtons() {
   if (crisisId === 1) {
     btnContainer.innerHTML = `
       <button class="btn-cyan" onclick="clientResolveCrisisAction('crisis1_discard')">Discard 2 Budget Cards</button>
-      <button class="btn-red" onclick="clientResolveCrisisAction('cannot_fulfill')">Cannot Fulfil (Skip Next Turn)</button>
+      <button class="btn-red" onclick="clientResolveCrisisAction('cannot_fulfill')">Cannot Fulfil (Skip Next Action Turn)</button>
     `;
   } else if (crisisId === 4) {
     btnContainer.innerHTML = `
       <button class="btn-gold" onclick="clientResolveCrisisAction('crisis4_gain_inno')">Gain 2 Innovation Cards</button>
       <button class="btn-red" onclick="clientResolveCrisisAction('crisis4_wipe_progress')">Wipe Current Mission Progress</button>
+      <button class="btn-cyan" onclick="clientResolveCrisisAction('cannot_fulfill')">Cannot Fulfil (Skip Next Turn)</button>
     `;
   } else {
     btnContainer.innerHTML = `
       <button class="btn-green" onclick="clientResolveCrisisAction('generic_fulfill')">Fulfil Crisis Requirements</button>
-      <button class="btn-red" onclick="clientResolveCrisisAction('cannot_fulfill')">Cannot Fulfil (Skip Next Turn)</button>
+      <button class="btn-red" onclick="clientResolveCrisisAction('cannot_fulfill')">Cannot Fulfil (Skip Next Action Turn)</button>
     `;
   }
 }
@@ -1416,8 +1542,17 @@ function renderMyTeam() {
   document.getElementById('my-team-name-label').innerText = `Team ${myTeamId} (${t.name})`;
   document.getElementById('my-team-points').innerText = `${t.points}`;
 
+  const isMyTurn = (myTeamId === gameState.activeTurnTeamId);
+  const waitBanner = document.getElementById('turn-wait-banner');
+  if (!isMyTurn && !isHost && !isSolo) {
+    waitBanner.style.display = 'block';
+    document.getElementById('turn-wait-team-name').innerText = `Team ${gameState.activeTurnTeamId} (${gameState.teams[gameState.activeTurnTeamId].name})`;
+  } else {
+    waitBanner.style.display = 'none';
+  }
+
   const skipBanner = document.getElementById('skip-turn-banner');
-  if (t.skipNextAction && gameState.phase === 'ACTION') {
+  if (t.skipNextAction && gameState.phase === 'ACTION' && isMyTurn) {
     skipBanner.style.display = 'block';
   } else {
     skipBanner.style.display = 'none';
@@ -1512,16 +1647,30 @@ function renderHand() {
   });
 }
 
+// UPDATE ACTION BUTTONS: Discard is greyed out during Action Phase, only active in Crisis
 function updateActionButtons() {
   const t = gameState.teams[myTeamId];
   const btnDraw = document.getElementById('btn-draw-resources');
   const btnDiscardSingle = document.getElementById('btn-discard-card');
 
-  const isActionPhase = gameState.phase === 'ACTION';
-  const isBlocked = !isActionPhase || t.actionTakenThisRound || t.skipNextAction;
+  const isMyTurn = (myTeamId === gameState.activeTurnTeamId) || isHost || isSolo;
+  const isActionPhase = (gameState.phase === 'ACTION');
+  const isCrisisPhase = (gameState.phase === 'CRISIS');
 
-  btnDraw.disabled = isBlocked || (gameState.drawDeck.length === 0 && gameState.discardDeck.length === 0);
-  btnDiscardSingle.disabled = selectedCardIndex === null;
+  // Draw Button: Active only during Action Phase on your turn
+  const isDrawBlocked = !isActionPhase || !isMyTurn || t.actionTakenThisRound || t.skipNextAction;
+  btnDraw.disabled = isDrawBlocked || (gameState.drawDeck.length === 0 && gameState.discardDeck.length === 0);
+
+  // Discard Button: Greyed out in Action Phase; only permitted in Crisis Phase
+  if (isCrisisPhase) {
+    btnDiscardSingle.disabled = (selectedCardIndex === null) || !isMyTurn;
+    btnDiscardSingle.title = "Discard selected card to resolve crisis penalty";
+    btnDiscardSingle.innerText = "Discard Selected Card (Crisis Penalty)";
+  } else {
+    btnDiscardSingle.disabled = true;
+    btnDiscardSingle.title = "Discarding is not permitted during Action Phase";
+    btnDiscardSingle.innerText = "Discard Selected Card (Crisis Only)";
+  }
 }
 
 // RENDER ALL TEAMS & MEMBER ROSTER FOR FACILITATOR
@@ -1532,7 +1681,15 @@ function renderAllTeamsGrid() {
   for (let id = 1; id <= 4; id++) {
     const t = gameState.teams[id];
     const card = document.createElement('div');
+    const isTurn = (id === gameState.activeTurnTeamId);
     card.className = `team-card ${id === myTeamId ? 'my-team' : ''}`;
+    if (isTurn) {
+      card.style.borderColor = (gameState.phase === 'CRISIS') ? 'var(--accent-red)' : 'var(--accent-cyan)';
+      card.style.boxShadow = (gameState.phase === 'CRISIS') ? '0 0 16px rgba(239, 68, 68, 0.4)' : '0 0 16px rgba(6, 182, 212, 0.4)';
+    } else {
+      card.style.borderColor = '#334155';
+      card.style.boxShadow = 'none';
+    }
 
     let missionInfo = `<span style="color:#94a3b8; font-style:italic;">Selecting next mission...</span>`;
     let slotsHtml = ``;
@@ -1550,14 +1707,13 @@ function renderAllTeamsGrid() {
       slotsHtml += `</div>`;
     }
 
-    // Team members list displayed on card
     const membersDisplay = (t.members && t.members.length > 0) 
       ? t.members.join(', ') 
       : '<span style="color:#64748b; font-style:italic;">None joined yet</span>';
 
     card.innerHTML = `
       <div style="display:flex; justify-content:space-between; align-items:center;">
-        <h4 style="font-size:0.9rem;">Team ${id}: ${t.name}</h4>
+        <h4 style="font-size:0.9rem; ${isTurn ? 'color:var(--accent-gold);' : ''}">Team ${id}: ${t.name} ${isTurn ? '⭐' : ''}</h4>
         <span class="badge badge-budget">${t.points} PTS</span>
       </div>
       <div style="font-size:0.8rem; color:#38bdf8; margin-top:4px;">
