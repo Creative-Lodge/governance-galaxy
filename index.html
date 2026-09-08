@@ -369,10 +369,9 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
 </head>
 <body>
 
-<!-- Facilitator Popout Toast Container -->
 <div id="toast-container"></div>
 
-<!-- LOBBY SCREEN (Only Student Join & Facilitator Host) -->
+<!-- LOBBY SCREEN -->
 <div id="view-lobby">
   <h1 style="font-size: 2.5rem; color: var(--accent-cyan); margin-bottom: 6px;">GALAXY GOVERNANCE</h1>
   <p style="color: #94a3b8; margin-bottom: 20px;">Digital Transformation Boardroom Simulation</p>
@@ -406,14 +405,12 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
         Host classroom boardroom session, cycle phases, and review governance actions.
       </p>
       
-      <!-- Launch with Password -->
       <div style="text-align: left; margin-bottom: 10px;">
         <label style="font-size: 0.8rem; color: var(--accent-gold); font-weight: bold;">FACILITATOR PASSWORD (PREVENTS STUDENT ACCESS):</label>
         <input type="password" id="create-host-password" class="lobby-input" placeholder="Create Room Password" style="margin-top: 4px;" />
       </div>
       <button class="btn-gold" style="width: 100%; padding: 14px;" onclick="startHostGame()">LAUNCH NEW GAME ROOM</button>
       
-      <!-- Resume Section with Password -->
       <div style="border-top: 1px solid #334155; margin-top: 20px; padding-top: 15px; text-align: left;">
         <span style="font-size: 0.85rem; font-weight: bold; color: var(--accent-cyan);">RESUME PREVIOUS ROOM AS FACILITATOR:</span>
         <input type="text" id="resume-room-code" class="lobby-input" placeholder="6-LETTER ROOM CODE" maxlength="6" style="margin: 8px 0 6px; text-transform: uppercase;" />
@@ -436,7 +433,6 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
       <span id="my-identity-tag" class="badge badge-innovation">FACILITATOR 🔒</span>
     </div>
 
-    <!-- Quick Team Focus Switcher for Facilitator -->
     <div id="fac-quick-switcher" style="display: none; align-items: center; gap: 6px;">
       <span style="font-size: 0.8rem; color: #94a3b8;">Focus:</span>
       <button id="btn-top-t1" style="padding: 4px 8px; font-size: 0.75rem;" onclick="hostSetTurn(1)">T1</button>
@@ -464,9 +460,9 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
 
       <!-- Rule Reset Alert Banner -->
       <div id="c8-rule-reset-banner" style="display: none; background: linear-gradient(90deg, #1e3a8a, #0369a1); border: 2px solid var(--accent-cyan); border-radius: 10px; padding: 12px 18px; margin-bottom: 15px; color: #fff;">
-        <span class="badge" style="background:#0284c7; color:#fff; margin-bottom:4px;">RULE RESET ACTIVE</span>
+        <span class="badge" style="background:#0284c7; color:#fff; margin-bottom:4px;">RULE RESET ACTIVE THIS PHASE</span>
         <div style="font-size:0.95rem; font-weight:bold;">
-          Each team can choose to <strong>Draw 3 Resource Cards</strong> (instead of 2), OR <strong>complete 2 mission progress slots of the same type</strong> with just 1 resource!
+          Each team chooses <strong>ONE action</strong>: Either <strong>Draw 3 Resource Cards</strong> OR <strong>Spend 1 card to fill 2 matching progress slots</strong>. Once chosen, that team's action is complete!
         </div>
       </div>
 
@@ -488,7 +484,6 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
           Effect details...
         </div>
 
-        <!-- Team Crisis Resolution Box -->
         <div id="crisis-team-options" class="crisis-resolution-box">
           <h4 id="crisis-options-header" style="color: #fca5a5; margin-bottom: 8px;">TEAM CRISIS DECISION:</h4>
           <div id="crisis-action-buttons" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
@@ -516,7 +511,6 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
           <div>Score: <strong id="my-team-points" style="color: var(--accent-gold); font-size: 1.3rem;">0</strong> PTS</div>
         </div>
 
-        <!-- Turn Wait Notice -->
         <div id="turn-wait-banner" style="display: none; background: #1e293b; border: 1px dashed var(--accent-cyan); border-radius: 8px; padding: 10px; margin: 12px 0; color: #38bdf8; font-size: 0.9rem;">
           ⏳ <strong>WAITING FOR YOUR TURN:</strong> Spotlight is currently on <span id="turn-wait-team-name">Team 1</span>. Discuss strategy with your team!
         </div>
@@ -543,7 +537,6 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
           <div id="active-mission-slots" class="slots-container"></div>
         </div>
 
-        <!-- Completed Missions -->
         <div style="margin: 10px 0; font-size: 0.85rem; color: #94a3b8;">
           Completed Missions: <span id="completed-missions-list" style="color: #34d399; font-weight: bold;">None</span>
         </div>
@@ -560,10 +553,11 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
         <!-- Action Controls -->
         <div id="player-action-controls" style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
           <button class="btn-gold" id="btn-draw-resources" onclick="clientDrawResources()">Draw 2 Resource Cards</button>
+          <span id="team-action-status-note" style="font-size: 0.85rem; color: #34d399; font-weight: bold; display: none;">✓ Action already taken this round.</span>
         </div>
       </div>
 
-      <!-- All Teams Overview (Shows teams with present members) -->
+      <!-- Teams Present Overview -->
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <h3>Galaxy Boardroom: Teams Present</h3>
         <span id="active-teams-count-badge" class="badge badge-cyan" style="background:#1e293b; color:var(--accent-cyan);">0 Team(s) Present</span>
@@ -598,7 +592,6 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
           <span class="badge badge-innovation">SECURE 🔒</span>
         </div>
         
-        <!-- Button to dispense starting cards ONLY to teams with members present -->
         <button id="btn-dispense-starting" class="btn-gold" style="width: 100%; margin-bottom: 12px;" onclick="hostDispenseStartingCards()">
           🃏 Dispense Starting Cards (Teams With Members Only)
         </button>
@@ -666,7 +659,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
         <div style="border-top: 1px solid #334155; margin-top: 15px; padding-top: 10px;">
           <h5 style="color: var(--accent-cyan); margin-bottom: 6px;">LIVE TEAM ACTIONS AUDIT:</h5>
           <div id="host-action-log" style="max-height: 160px; overflow-y: auto; font-size: 0.78rem; background: #090e17; padding: 8px; border-radius: 6px; border: 1px solid #334155; display: flex; flex-direction: column; gap: 4px;">
-            <div style="color: #64748b; font-style: italic;">Awaiting team joins from student devices...</div>
+            <div style="color: #64748b; font-style: italic;">Awaiting team activities...</div>
           </div>
         </div>
       </div>
@@ -719,7 +712,7 @@ const CRISIS_DECK = [
   { id: 5, name: "Slow Burn Security Flaw", flavor: "A minor security flaw discovered. Lasts TWO rounds.", effect: "Discard 1 Data Card, OR spend 2 Compliance + 1 Budget to eliminate the flaw completely." },
   { id: 6, name: "Digital Skill Gap", flavor: "Senior leadership lacks digital literacy.", effect: "Train (Discard 2 Budget for 2 Innovation) OR Hire (Discard 1 of each card for 1 Progress Unit)." },
   { id: 7, name: "The Patent Race", flavor: "Competitor is filing identical technology! First to file wins.", effect: "SIMULTANEOUS: First team to discard 3 Innovation + 1 Budget gains 2 progress units & draws 2 cards!" },
-  { id: 8, name: "Rule Reset", flavor: "A global black swan event reshapes the industry.", effect: "In the next Action Phase: Choose to Draw 3 Resource Cards (instead of 2), OR spend 1 Resource Card to complete 2 matching mission progress slots!" },
+  { id: 8, name: "Rule Reset", flavor: "A global black swan event reshapes the industry.", effect: "In the next Action Phase: Choose EITHER to Draw 3 Resource Cards, OR spend 1 Resource Card to complete 2 matching mission progress slots!" },
   { id: 9, name: "Market Disruption", flavor: "Competitor launch makes mission obsolete.", effect: "Spend 1 Innovation + 1 Budget to cancel, or current mission value drops by 2 points." },
   { id: 10, name: "Resource Snipe", flavor: "Critical component shortage creates seller's market.", effect: "Inspect the next active team's hand. Select 2 cards from your hand and swap with 2 of theirs." },
   { id: 11, name: "The Great Resignation", flavor: "Mid-level leadership has been poached.", effect: "Discard cards based on completed missions: 0 missions = 1 card, 1 mission = 2 cards, 2 missions = 3 cards." },
@@ -742,6 +735,7 @@ let gameState = {
   hostPasswordHash: "",
   phase: "ACTION",
   activeTurnTeamId: 1,
+  // Round 1 strictly begins with Crisis 1 through 15
   crisisDeckOrder: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
   crisisOrderIndex: 0,
   roundNumber: 1,
@@ -805,7 +799,6 @@ function createDefaultTeamState(name) {
   };
 }
 
-// STRICT RESTRICTION: Helper to find teams that have students actually joined
 function getTeamsWithMembers() {
   const present = [];
   for (let id = 1; id <= 4; id++) {
@@ -816,7 +809,6 @@ function getTeamsWithMembers() {
   return present;
 }
 
-// Active gameplay teams: If students joined, only cycle and play teams with members present
 function getActiveTeamIds() {
   const present = getTeamsWithMembers();
   return present.length > 0 ? present : [1];
@@ -954,7 +946,6 @@ function drawCardsForTeam(teamId, count) {
   }
 }
 
-// RESTRICTED CARD DISTRIBUTION: Dispenses 5 cards only to teams that have members present!
 function hostDispenseStartingCards() {
   if (!isHost) return;
   const presentTeamIds = getTeamsWithMembers();
@@ -970,7 +961,7 @@ function hostDispenseStartingCards() {
   });
 
   const names = presentTeamIds.map(id => `Team ${id}`).join(', ');
-  showFacilitatorToast(`🃏 Dispensed 5 cards to teams with members present: ${names}! (Empty teams received none)`, 'gold');
+  showFacilitatorToast(`🃏 Dispensed 5 cards to teams with members: ${names}! (Empty teams received none)`, 'gold');
   broadcastGameState();
 }
 
@@ -1244,7 +1235,6 @@ function handleHostReceiveData(data) {
         t.members.push(data.name);
       }
       showFacilitatorToast(`👤 ${data.name} joined Team ${data.teamId} (${t.name})`);
-      // If current focus was on an empty team, switch to this newly active team
       const present = getTeamsWithMembers();
       if (!present.includes(gameState.activeTurnTeamId)) {
         gameState.activeTurnTeamId = data.teamId;
@@ -1279,6 +1269,7 @@ function handleHostReceiveData(data) {
           t.activeMissionFilledSlots.push(slotIndex);
         }
 
+        // Rule Reset benefit: 1 card spent fills 2 matching slots
         let extraFilled = false;
         if (gameState.crisis8RuleResetActive) {
           for (let i = 0; i < allSlots.length; i++) {
@@ -1292,16 +1283,17 @@ function handleHostReceiveData(data) {
 
         showFacilitatorToast(`🎯 Team ${data.teamId} spent 1 ${requiredSlotType} and filled ${extraFilled ? '2' : '1'} slot(s) on ${mission.name}!`, 'success');
         checkMissionCompletion(data.teamId);
-        t.actionTakenThisRound = true;
+        t.actionTakenThisRound = true; // Locks out further actions (draw or placement)
         broadcastGameState();
       }
       break;
 
     case 'ACTION_DRAW':
       snapshotTeamState(data.teamId, 'Drew Resource Cards');
+      // Rule Reset choice: draw 3 cards instead of 2
       const drawQty = gameState.crisis8RuleResetActive ? 3 : 2;
       drawCardsForTeam(data.teamId, drawQty);
-      t.actionTakenThisRound = true;
+      t.actionTakenThisRound = true; // Locks out further actions (draw or placement)
       showFacilitatorToast(`📦 Team ${data.teamId} drew ${drawQty} Resource Cards${gameState.crisis8RuleResetActive ? ' (Rule Reset Advantage)' : ''}`);
       broadcastGameState();
       break;
@@ -1441,9 +1433,12 @@ function hostCycleNextTurn() {
 }
 
 function hostTriggerNextCrisis() {
+  // Conclude Rule Reset automatically when crisis phase triggers
+  gameState.crisis8RuleResetActive = false;
+
   if (gameState.crisisOrderIndex >= gameState.crisisDeckOrder.length) {
     gameState.roundNumber = (gameState.roundNumber || 1) + 1;
-    // Round 2+ indefinitely: Always start with Crisis 1, followed by 2-15 randomized!
+    // Indefinite loops: Always start with Crisis 1, followed by 2-15 randomized
     const randomizedCrises2to15 = shuffleArray([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]);
     gameState.crisisDeckOrder = [1, ...randomizedCrises2to15];
     gameState.crisisOrderIndex = 0;
@@ -1455,7 +1450,6 @@ function hostTriggerNextCrisis() {
   gameState.activeCrisis = crisis;
   gameState.crisisOrderIndex++;
   gameState.phase = 'CRISIS';
-  gameState.crisis8RuleResetActive = false;
 
   if (crisis.id === 8) {
     gameState.crisis8PendingNextAction = true;
@@ -1491,10 +1485,11 @@ function hostConcludeCrisisAndStartAction() {
   gameState.phase = 'ACTION';
   gameState.activeCrisis = null;
 
+  // Rule Reset activates ONLY for this immediate Action Phase
   if (gameState.crisis8PendingNextAction) {
     gameState.crisis8RuleResetActive = true;
     gameState.crisis8PendingNextAction = false;
-    showFacilitatorToast(`⚡ RULE RESET ACTIVE: Draw 3 cards OR fill 2 matching slots with 1 resource!`, 'gold');
+    showFacilitatorToast(`⚡ RULE RESET ACTIVE THIS PHASE: Draw 3 cards OR fill 2 matching slots with 1 card!`, 'gold');
   } else {
     gameState.crisis8RuleResetActive = false;
   }
@@ -1530,7 +1525,6 @@ function hostResetRound() {
   broadcastGameState();
 }
 
-// RESTRICTED GRANT MODAL: Only lists teams with members present
 function hostOpenFacPoolModal() {
   document.getElementById('modal-fac-pool').style.display = 'flex';
   document.getElementById('cnt-f-b').innerText = gameState.facilitatorPool.BUDGET;
@@ -1629,7 +1623,6 @@ function hostResolveCrisis14Bids() {
   broadcastGameState();
 }
 
-// RESTRICTED EVALUATION: Evaluates only teams with members present
 function hostExecuteCrisis15() {
   const presentIds = getTeamsWithMembers();
   if (presentIds.length === 0) {
@@ -1654,11 +1647,9 @@ function hostExecuteCrisis15() {
   const mostCompTeamId = counts[0].id;
   const leastCompTeamId = counts[counts.length - 1].id;
 
-  // Reward most compliant present team with 2 Budget + 1 Progress
   gameState.teams[mostCompTeamId].hand.push('BUDGET', 'BUDGET');
   addProgressUnitsToTeam(mostCompTeamId, 1);
 
-  // Least compliant loses 1 Innovation
   const innoIdx = gameState.teams[leastCompTeamId].hand.indexOf('INNOVATION');
   if (innoIdx > -1) {
     const rm = gameState.teams[leastCompTeamId].hand.splice(innoIdx, 1)[0];
@@ -1721,7 +1712,7 @@ function hostEvaluateWinner() {
 }
 
 /* =========================================================================
-   CLIENT ACTIONS & MISSION FULFILLMENT
+   CLIENT ACTIONS & MISSION FULFILLMENT (STRICT TURN LOCK ENFORCEMENT)
    ========================================================================= */
 
 function getTargetTeamId() {
@@ -1780,16 +1771,16 @@ function clientToggleTargetCard(index) {
 
 function clientClickActiveSlot(slotIndex) {
   const targetId = getTargetTeamId();
-  if (!isHost && targetId !== gameState.activeTurnTeamId) {
-    alert("It is not your team's turn yet!");
+  if (targetId !== gameState.activeTurnTeamId) {
+    alert("It is not this team's turn yet!");
     return;
   }
   const t = gameState.teams[targetId];
-  if (!isHost && t.actionTakenThisRound) {
-    alert("This team has already taken an action this round!");
+  if (t.actionTakenThisRound) {
+    alert("This team has already completed their action for this phase!");
     return;
   }
-  if (!isHost && t.skipNextAction && gameState.phase === 'ACTION') {
+  if (t.skipNextAction && gameState.phase === 'ACTION') {
     alert("Action turn is skipped this round due to crisis penalty!");
     return;
   }
@@ -1820,8 +1811,13 @@ function clientClickActiveSlot(slotIndex) {
 
 function clientDrawResources() {
   const targetId = getTargetTeamId();
-  if (!isHost && targetId !== gameState.activeTurnTeamId) {
-    alert("It is not your team's turn yet!");
+  if (targetId !== gameState.activeTurnTeamId) {
+    alert("It is not this team's turn yet!");
+    return;
+  }
+  const t = gameState.teams[targetId];
+  if (t.actionTakenThisRound) {
+    alert("This team has already completed their action for this round!");
     return;
   }
   clientSendAction({ type: 'ACTION_DRAW', teamId: targetId });
@@ -1997,7 +1993,6 @@ function clientResolveCrisisAction(actionType, extraData = {}) {
       break;
     }
 
-    // Crisis 12 draws only for teams with members present
     case 'crisis12_discard_compliance': {
       if (countCard('COMPLIANCE') < 3) return;
       clientSendAction({
@@ -2349,7 +2344,7 @@ function renderCrisisInteractiveButtons() {
   else if (crisisId === 8) {
     btnContainer.innerHTML = `
       <div style="width:100%; color:#38bdf8; font-weight:bold; margin-bottom:8px;">
-        Rule Reset takes effect in the next Action Phase: Choose to Draw 3 cards, OR spend 1 resource card to complete 2 matching mission progress units!
+        Rule Reset takes effect in the next Action Phase: Choose EITHER to Draw 3 cards, OR spend 1 resource card to complete 2 matching mission progress units!
       </div>
       <button class="btn-cyan" onclick="clientResolveCrisisAction('crisis8_ack')">Acknowledge Rule Reset</button>
     `;
@@ -2575,7 +2570,7 @@ function renderBoardroomView() {
     document.getElementById('active-mission-value-badge').innerText = `${finalVal} PTS ${t.missionValuePenalty ? `(-${t.missionValuePenalty})` : ''}`;
 
     document.getElementById('mission-work-instructions').innerHTML = gameState.crisis8RuleResetActive
-      ? `⚡ <strong>Rule Reset Active:</strong> Spend 1 resource card to complete <strong>2 matching progress slots</strong>!`
+      ? `⚡ <strong>Rule Reset Active:</strong> Spend 1 resource card to complete <strong>2 matching progress slots</strong> (OR choose Draw 3 cards below)!`
       : `Select a matching card from hand below, then click <strong>any open slot</strong> to fill it.`;
 
     renderActiveMissionSlots();
@@ -2635,21 +2630,30 @@ function renderHand() {
   });
 }
 
+// STRICT ACTION ENFORCEMENT: Enforces single action lock across all participants and facilitators
 function updateActionButtons() {
   const targetId = getTargetTeamId();
   const t = gameState.teams[targetId];
   const btnDraw = document.getElementById('btn-draw-resources');
+  const statusNote = document.getElementById('team-action-status-note');
 
-  const isTurn = (targetId === gameState.activeTurnTeamId) || isHost;
+  const isTurn = (targetId === gameState.activeTurnTeamId);
   const isActionPhase = (gameState.phase === 'ACTION');
 
-  btnDraw.innerText = gameState.crisis8RuleResetActive ? "Draw 3 Resource Cards (Rule Reset)" : "Draw 2 Resource Cards";
+  btnDraw.innerText = gameState.crisis8RuleResetActive ? "Draw 3 Resource Cards (Rule Reset Choice)" : "Draw 2 Resource Cards";
 
-  const isDrawBlocked = !isActionPhase || !isTurn || (!isHost && t.actionTakenThisRound) || (!isHost && t.skipNextAction);
+  // Lock out if action has already been taken (strictly enforced)
+  const isDrawBlocked = !isActionPhase || !isTurn || t.actionTakenThisRound || t.skipNextAction;
   btnDraw.disabled = isDrawBlocked || (gameState.drawDeck.length === 0 && gameState.discardDeck.length === 0);
+
+  if (t.actionTakenThisRound) {
+    statusNote.style.display = 'inline-block';
+    statusNote.innerText = '✓ Action completed for this phase.';
+  } else {
+    statusNote.style.display = 'none';
+  }
 }
 
-// Renders boardroom overview: Highlights teams with present students
 function renderAllTeamsGrid() {
   const grid = document.getElementById('all-teams-grid');
   grid.innerHTML = "";
@@ -2657,7 +2661,6 @@ function renderAllTeamsGrid() {
   const presentIds = getTeamsWithMembers();
   document.getElementById('active-teams-count-badge').innerText = `${presentIds.length} Team(s) Present`;
 
-  // Display all present teams, or provide join guidance if no members have entered yet
   if (presentIds.length === 0) {
     grid.innerHTML = `
       <div style="grid-column: 1/-1; padding: 25px; background: rgba(15,23,42,0.8); border: 1px dashed var(--accent-cyan); border-radius: 12px; text-align: center; color: #94a3b8;">
