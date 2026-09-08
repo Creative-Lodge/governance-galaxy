@@ -372,7 +372,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
 <!-- Facilitator Popout Toast Container -->
 <div id="toast-container"></div>
 
-<!-- LOBBY SCREEN -->
+<!-- LOBBY SCREEN (Only Student Join & Facilitator Host) -->
 <div id="view-lobby">
   <h1 style="font-size: 2.5rem; color: var(--accent-cyan); margin-bottom: 6px;">GALAXY GOVERNANCE</h1>
   <p style="color: #94a3b8; margin-bottom: 20px;">Digital Transformation Boardroom Simulation</p>
@@ -380,8 +380,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
   <div class="lobby-box">
     <div style="display: flex; gap: 8px; margin-bottom: 20px;">
       <button id="tab-btn-join" class="btn-cyan" style="flex:1" onclick="switchLobbyTab('join')">Student Join</button>
-      <button id="tab-btn-host" class="" style="flex:1" onclick="switchLobbyTab('host')">Facilitator</button>
-      <button id="tab-btn-solo" class="" style="flex:1" onclick="switchLobbyTab('solo')">Solo Test</button>
+      <button id="tab-btn-host" class="" style="flex:1" onclick="switchLobbyTab('host')">Facilitator Host</button>
     </div>
 
     <!-- STUDENT JOIN FORM -->
@@ -404,13 +403,13 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
     <!-- FACILITATOR HOST & RESUME FORM -->
     <div id="lobby-host-section" style="display: none;">
       <p style="color: #cbd5e1; font-size: 0.9rem; margin-bottom: 12px;">
-        Host classroom simulation, cycle phases, and review governance actions. Protect your boardroom session with a password.
+        Host classroom boardroom session, cycle phases, and review governance actions.
       </p>
       
       <!-- Launch with Password -->
       <div style="text-align: left; margin-bottom: 10px;">
-        <label style="font-size: 0.8rem; color: var(--accent-gold); font-weight: bold;">SET FACILITATOR PASSWORD (TO PREVENT STUDENT ACCESS):</label>
-        <input type="password" id="create-host-password" class="lobby-input" placeholder="Create Facilitator Password" style="margin-top: 4px;" />
+        <label style="font-size: 0.8rem; color: var(--accent-gold); font-weight: bold;">FACILITATOR PASSWORD (PREVENTS STUDENT ACCESS):</label>
+        <input type="password" id="create-host-password" class="lobby-input" placeholder="Create Room Password" style="margin-top: 4px;" />
       </div>
       <button class="btn-gold" style="width: 100%; padding: 14px;" onclick="startHostGame()">LAUNCH NEW GAME ROOM</button>
       
@@ -423,14 +422,6 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
       </div>
       <div id="host-status" style="margin-top: 10px; font-size: 0.85rem; color: var(--accent-gold);"></div>
     </div>
-
-    <!-- SOLO TEST FORM -->
-    <div id="lobby-solo-section" style="display: none;">
-      <p style="color: #cbd5e1; font-size: 0.9rem; margin-bottom: 15px;">
-        Test all 4 teams and facilitator controls on a single screen without extra devices.
-      </p>
-      <button class="btn-green" style="width: 100%; padding: 14px;" onclick="startSoloTest()">LAUNCH OFFLINE SANDBOX</button>
-    </div>
   </div>
 </div>
 
@@ -438,20 +429,20 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
 <div id="view-game" style="display: none;">
   <!-- Header Bar -->
   <div class="top-bar">
-    <div style="display: flex; align-items: center;">
+    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
       <span class="brand-font" style="font-size: 1.15rem; color: var(--accent-cyan);">GALAXY GOVERNANCE</span>
-      <span id="room-code-tag" class="badge" style="margin-left: 8px; background: #334155; color: #fff;">ROOM: ----</span>
-      <span id="network-status-tag" class="badge" style="margin-left: 6px; background: #064e3b; color: #34d399;">🟢 Connected</span>
-      <span id="my-identity-tag" class="badge badge-innovation" style="margin-left: 6px;">Spectator</span>
+      <span id="room-code-tag" class="badge" style="background: #334155; color: #fff;">ROOM: ----</span>
+      <span id="network-status-tag" class="badge" style="background: #854d0e; color: #fef08a;">🟡 Connecting...</span>
+      <span id="my-identity-tag" class="badge badge-innovation">FACILITATOR 🔒</span>
     </div>
 
-    <!-- Simulator Switcher -->
-    <div id="dev-team-switcher" style="display: none; align-items: center; gap: 6px;">
-      <span style="font-size: 0.8rem; color: #94a3b8;">Simulate:</span>
-      <button style="padding: 4px 8px; font-size: 0.75rem;" onclick="switchSimulatedTeam(1)">T1</button>
-      <button style="padding: 4px 8px; font-size: 0.75rem;" onclick="switchSimulatedTeam(2)">T2</button>
-      <button style="padding: 4px 8px; font-size: 0.75rem;" onclick="switchSimulatedTeam(3)">T3</button>
-      <button style="padding: 4px 8px; font-size: 0.75rem;" onclick="switchSimulatedTeam(4)">T4</button>
+    <!-- Quick Team Focus Switcher for Facilitator -->
+    <div id="fac-quick-switcher" style="display: none; align-items: center; gap: 6px;">
+      <span style="font-size: 0.8rem; color: #94a3b8;">Focus:</span>
+      <button id="btn-top-t1" style="padding: 4px 8px; font-size: 0.75rem;" onclick="hostSetTurn(1)">T1</button>
+      <button id="btn-top-t2" style="padding: 4px 8px; font-size: 0.75rem;" onclick="hostSetTurn(2)">T2</button>
+      <button id="btn-top-t3" style="padding: 4px 8px; font-size: 0.75rem;" onclick="hostSetTurn(3)">T3</button>
+      <button id="btn-top-t4" style="padding: 4px 8px; font-size: 0.75rem;" onclick="hostSetTurn(4)">T4</button>
     </div>
 
     <div style="display: flex; align-items: center; gap: 10px;">
@@ -572,10 +563,10 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
         </div>
       </div>
 
-      <!-- All Teams Overview -->
+      <!-- All Teams Overview (Shows teams with present members) -->
       <div style="display: flex; justify-content: space-between; align-items: center;">
-        <h3>Galaxy Boardroom: Active Teams</h3>
-        <span id="active-teams-count-badge" class="badge badge-cyan" style="background:#1e293b; color:var(--accent-cyan);">0 Teams Joined</span>
+        <h3>Galaxy Boardroom: Teams Present</h3>
+        <span id="active-teams-count-badge" class="badge badge-cyan" style="background:#1e293b; color:var(--accent-cyan);">0 Team(s) Present</span>
       </div>
       <div id="all-teams-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 10px;"></div>
     </div>
@@ -607,13 +598,13 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
           <span class="badge badge-innovation">SECURE 🔒</span>
         </div>
         
-        <!-- Button to dispense starting cards -->
+        <!-- Button to dispense starting cards ONLY to teams with members present -->
         <button id="btn-dispense-starting" class="btn-gold" style="width: 100%; margin-bottom: 12px;" onclick="hostDispenseStartingCards()">
-          🃏 Dispense Starting Cards (5 Cards)
+          🃏 Dispense Starting Cards (Teams With Members Only)
         </button>
 
         <div style="background: #090e17; padding: 10px; border-radius: 8px; border: 1px solid var(--accent-cyan); margin-bottom: 12px;">
-          <span style="font-size: 0.8rem; color: #94a3b8; font-weight: bold;">TOGGLE ACTIVE TEAMS:</span>
+          <span style="font-size: 0.8rem; color: #94a3b8; font-weight: bold;">CYCLE ACTIVE TEAMS:</span>
           <div id="fac-team-toggle-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-top: 6px;">
             <button id="btn-turn-t1" style="padding: 6px 2px; font-size: 0.75rem;" onclick="hostSetTurn(1)">T1</button>
             <button id="btn-turn-t2" style="padding: 6px 2px; font-size: 0.75rem;" onclick="hostSetTurn(2)">T2</button>
@@ -621,7 +612,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
             <button id="btn-turn-t4" style="padding: 6px 2px; font-size: 0.75rem;" onclick="hostSetTurn(4)">T4</button>
           </div>
           <button class="btn-cyan" style="width: 100%; margin-top: 8px; padding: 8px;" onclick="hostCycleNextTurn()">
-            Next Active Team Turn ⏭️
+            Next Team Turn ⏭️
           </button>
         </div>
 
@@ -675,7 +666,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
         <div style="border-top: 1px solid #334155; margin-top: 15px; padding-top: 10px;">
           <h5 style="color: var(--accent-cyan); margin-bottom: 6px;">LIVE TEAM ACTIONS AUDIT:</h5>
           <div id="host-action-log" style="max-height: 160px; overflow-y: auto; font-size: 0.78rem; background: #090e17; padding: 8px; border-radius: 6px; border: 1px solid #334155; display: flex; flex-direction: column; gap: 4px;">
-            <div style="color: #64748b; font-style: italic;">Awaiting team activities...</div>
+            <div style="color: #64748b; font-style: italic;">Awaiting team joins from student devices...</div>
           </div>
         </div>
       </div>
@@ -687,7 +678,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important
 <div id="modal-fac-pool" class="modal-overlay" style="display: none;">
   <div class="modal-content">
     <h3>Facilitator Pool Grant</h3>
-    <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 15px;">Grant a reserve card to any team.</p>
+    <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 15px;">Grant a reserve card to a team with active members.</p>
     <div style="margin-bottom: 12px; text-align: left;">
       <label>Target Team:</label>
       <select id="fac-grant-team" class="lobby-input" style="text-align: left;"></select>
@@ -739,7 +730,6 @@ const CRISIS_DECK = [
 ];
 
 let isHost = false;
-let isSolo = false;
 let mqttClient = null;
 let myTeamId = 1;
 let myPlayerName = "Board Member";
@@ -752,7 +742,6 @@ let gameState = {
   hostPasswordHash: "",
   phase: "ACTION",
   activeTurnTeamId: 1,
-  // Round 1 starts with Crisis 1 to 15 in strict sequential order
   crisisDeckOrder: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
   crisisOrderIndex: 0,
   roundNumber: 1,
@@ -816,20 +805,26 @@ function createDefaultTeamState(name) {
   };
 }
 
-function getActiveTeamIds() {
-  if (isSolo) return [1, 2, 3, 4];
-  const active = [];
+// STRICT RESTRICTION: Helper to find teams that have students actually joined
+function getTeamsWithMembers() {
+  const present = [];
   for (let id = 1; id <= 4; id++) {
     if (gameState.teams[id].members && gameState.teams[id].members.length > 0) {
-      active.push(id);
+      present.push(id);
     }
   }
-  return active.length > 0 ? active : [1];
+  return present;
+}
+
+// Active gameplay teams: If students joined, only cycle and play teams with members present
+function getActiveTeamIds() {
+  const present = getTeamsWithMembers();
+  return present.length > 0 ? present : [1];
 }
 
 function getNextActiveTeamId(currentId) {
   const activeIds = getActiveTeamIds();
-  if (activeIds.length <= 1) return null;
+  if (activeIds.length <= 1) return activeIds[0] || 1;
   const currentIndex = activeIds.indexOf(currentId);
   if (currentIndex === -1) return activeIds[0];
   return activeIds[(currentIndex + 1) % activeIds.length];
@@ -922,10 +917,8 @@ window.addEventListener('load', () => {
 function switchLobbyTab(tab) {
   document.getElementById('lobby-join-section').style.display = tab === 'join' ? 'block' : 'none';
   document.getElementById('lobby-host-section').style.display = tab === 'host' ? 'block' : 'none';
-  document.getElementById('lobby-solo-section').style.display = tab === 'solo' ? 'block' : 'none';
   document.getElementById('tab-btn-join').className = tab === 'join' ? 'btn-cyan' : '';
   document.getElementById('tab-btn-host').className = tab === 'host' ? 'btn-gold' : '';
-  document.getElementById('tab-btn-solo').className = tab === 'solo' ? 'btn-green' : '';
 }
 
 function initMainDeck() {
@@ -961,42 +954,71 @@ function drawCardsForTeam(teamId, count) {
   }
 }
 
+// RESTRICTED CARD DISTRIBUTION: Dispenses 5 cards only to teams that have members present!
 function hostDispenseStartingCards() {
   if (!isHost) return;
-  const eligibleTeamIds = isSolo 
-    ? [1, 2, 3, 4] 
-    : [1, 2, 3, 4].filter(id => gameState.teams[id].members && gameState.teams[id].members.length > 0);
+  const presentTeamIds = getTeamsWithMembers();
 
-  if (eligibleTeamIds.length === 0) {
-    alert("No active teams with joined members found! Wait for students to join.");
+  if (presentTeamIds.length === 0) {
+    alert("⚠️ No students have joined any team yet! Cards can only be dispensed to teams with members present. Ask students to scan the QR or enter the room code.");
+    showFacilitatorToast("⚠️ Card distribution cancelled: No teams with members present.", "alert");
     return;
   }
 
-  eligibleTeamIds.forEach(id => {
+  presentTeamIds.forEach(id => {
     drawCardsForTeam(id, 5);
   });
 
-  showFacilitatorToast(`🃏 Dispensed 5 starting resource cards to ${eligibleTeamIds.length} joined team(s)!`, 'gold');
+  const names = presentTeamIds.map(id => `Team ${id}`).join(', ');
+  showFacilitatorToast(`🃏 Dispensed 5 cards to teams with members present: ${names}! (Empty teams received none)`, 'gold');
   broadcastGameState();
 }
 
 function connectMqtt(onConnectCb) {
+  const netTag = document.getElementById('network-status-tag');
+  if (netTag) {
+    netTag.innerText = "🟡 Connecting...";
+    netTag.style.background = "#854d0e";
+  }
+
   const broker = 'wss://broker.hivemq.com:8884/mqtt';
-  const client = mqtt.connect(broker, {
-    clientId: 'gg_' + Math.random().toString(16).substring(2, 10),
-    keepalive: 60
-  });
+  let client;
+  try {
+    client = mqtt.connect(broker, {
+      clientId: 'gg_' + Math.random().toString(16).substring(2, 10),
+      keepalive: 60,
+      connectTimeout: 8000
+    });
 
-  client.on('connect', () => {
-    document.getElementById('network-status-tag').innerText = "🟢 Connected";
-    document.getElementById('network-status-tag').style.background = "#064e3b";
-    onConnectCb();
-  });
+    client.on('connect', () => {
+      if (netTag) {
+        netTag.innerText = "🟢 Connected";
+        netTag.style.background = "#064e3b";
+      }
+      if (onConnectCb) onConnectCb();
+    });
 
-  client.on('offline', () => {
-    document.getElementById('network-status-tag').innerText = "🔴 Reconnecting...";
-    document.getElementById('network-status-tag').style.background = "#7f1d1d";
-  });
+    client.on('offline', () => {
+      if (netTag) {
+        netTag.innerText = "🔴 Reconnecting...";
+        netTag.style.background = "#7f1d1d";
+      }
+    });
+
+    client.on('error', (err) => {
+      console.warn("MQTT notice:", err);
+      if (netTag) {
+        netTag.innerText = "🟠 Standalone Mode";
+        netTag.style.background = "#c2410c";
+      }
+    });
+  } catch (e) {
+    console.warn("MQTT init notice:", e);
+    if (netTag) {
+      netTag.innerText = "🟠 Standalone Mode";
+      netTag.style.background = "#c2410c";
+    }
+  }
 
   return client;
 }
@@ -1009,14 +1031,12 @@ async function startHostGame() {
   }
 
   isHost = true;
-  isSolo = false;
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   let roomCode = "";
   for (let i = 0; i < 6; i++) roomCode += chars.charAt(Math.floor(Math.random() * chars.length));
   gameState.roomCode = roomCode;
 
   gameState.hostPasswordHash = await hashPassword(pwd);
-  // Round 1 begins strictly with Crisis 1 through 15
   gameState.crisisDeckOrder = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
   gameState.crisisOrderIndex = 0;
   gameState.roundNumber = 1;
@@ -1025,12 +1045,18 @@ async function startHostGame() {
   localStorage.setItem('galaxy_host_room', roomCode);
   localStorage.setItem('galaxy_host_pwd', pwd);
 
-  document.getElementById('host-status').innerText = "Launching protected boardroom room...";
+  document.getElementById('view-lobby').style.display = 'none';
+  document.getElementById('view-game').style.display = 'block';
+  document.getElementById('host-controls-panel').style.display = 'block';
+  document.getElementById('fac-quick-switcher').style.display = 'flex';
+  document.getElementById('room-code-tag').innerText = `ROOM: ${roomCode}`;
+  document.getElementById('my-identity-tag').innerText = `FACILITATOR 🔒`;
+  document.getElementById('boardroom-view-indicator').style.display = 'inline-block';
+
+  renderUI();
 
   mqttClient = connectMqtt(() => {
     const topicAction = `galaxy-gov/${roomCode}/action`;
-    const topicState = `galaxy-gov/${roomCode}/state`;
-
     mqttClient.subscribe(topicAction);
     mqttClient.on('message', (topic, payload) => {
       if (topic === topicAction) {
@@ -1039,16 +1065,7 @@ async function startHostGame() {
         } catch(e) { console.error(e); }
       }
     });
-
-    document.getElementById('view-lobby').style.display = 'none';
-    document.getElementById('view-game').style.display = 'block';
-    document.getElementById('host-controls-panel').style.display = 'block';
-    document.getElementById('room-code-tag').innerText = `ROOM: ${roomCode}`;
-    document.getElementById('my-identity-tag').innerText = `FACILITATOR 🔒`;
-    document.getElementById('boardroom-view-indicator').style.display = 'inline-block';
-
     broadcastGameState();
-    renderUI();
   });
 }
 
@@ -1092,7 +1109,6 @@ async function resumeHostGame() {
 
           authChecked = true;
           isHost = true;
-          isSolo = false;
           gameState = incomingState;
 
           if (!gameState.crisisDeckOrder) {
@@ -1114,6 +1130,7 @@ async function resumeHostGame() {
           document.getElementById('view-lobby').style.display = 'none';
           document.getElementById('view-game').style.display = 'block';
           document.getElementById('host-controls-panel').style.display = 'block';
+          document.getElementById('fac-quick-switcher').style.display = 'flex';
           document.getElementById('room-code-tag').innerText = `ROOM: ${code}`;
           document.getElementById('my-identity-tag').innerText = `FACILITATOR 🔒`;
           document.getElementById('boardroom-view-indicator').style.display = 'inline-block';
@@ -1138,11 +1155,17 @@ function joinAsStudent() {
     return;
   }
 
-  document.getElementById('join-status').innerText = "Connecting to room " + code + "...";
   isHost = false;
-  isSolo = false;
   myTeamId = team;
   myPlayerName = name;
+
+  document.getElementById('view-lobby').style.display = 'none';
+  document.getElementById('view-game').style.display = 'block';
+  document.getElementById('room-code-tag').innerText = `ROOM: ${code}`;
+  document.getElementById('my-identity-tag').innerText = `Team ${myTeamId}`;
+  document.getElementById('my-identity-tag').className = 'badge badge-budget';
+  document.getElementById('boardroom-view-indicator').style.display = 'none';
+  document.getElementById('fac-quick-switcher').style.display = 'none';
 
   mqttClient = connectMqtt(() => {
     const topicState = `galaxy-gov/${code}/state`;
@@ -1159,19 +1182,12 @@ function joinAsStudent() {
     });
 
     mqttClient.publish(topicAction, JSON.stringify({ type: 'PLAYER_JOIN', teamId: myTeamId, name: myPlayerName }));
-
-    document.getElementById('view-lobby').style.display = 'none';
-    document.getElementById('view-game').style.display = 'block';
-    document.getElementById('room-code-tag').innerText = `ROOM: ${code}`;
-    document.getElementById('my-identity-tag').innerText = `Team ${myTeamId}`;
-    document.getElementById('my-identity-tag').className = 'badge badge-budget';
-    document.getElementById('boardroom-view-indicator').style.display = 'none';
   });
 }
 
 function broadcastGameState() {
   renderUI();
-  if (isSolo || !isHost || !mqttClient) return;
+  if (!isHost || !mqttClient) return;
   const topicState = `galaxy-gov/${gameState.roomCode}/state`;
   mqttClient.publish(topicState, JSON.stringify(gameState), { retain: true });
 }
@@ -1186,7 +1202,7 @@ function checkMissionCompletion(teamId) {
     const finalVal = Math.max(0, mission.value - (t.missionValuePenalty || 0));
     t.points += finalVal;
     t.completedMissions.push(t.activeMissionKey);
-    showFacilitatorToast(`🏆 Team ${teamId} COMPLETED ${mission.name} (+${finalVal} PTS)! They must select their next mission board.`, 'gold');
+    showFacilitatorToast(`🏆 Team ${teamId} COMPLETED ${mission.name} (+${finalVal} PTS)! Select next mission board.`, 'gold');
 
     t.activeMissionKey = null;
     t.activeMissionFilledSlots = [];
@@ -1228,6 +1244,11 @@ function handleHostReceiveData(data) {
         t.members.push(data.name);
       }
       showFacilitatorToast(`👤 ${data.name} joined Team ${data.teamId} (${t.name})`);
+      // If current focus was on an empty team, switch to this newly active team
+      const present = getTeamsWithMembers();
+      if (!present.includes(gameState.activeTurnTeamId)) {
+        gameState.activeTurnTeamId = data.teamId;
+      }
       broadcastGameState();
       break;
 
@@ -1372,7 +1393,7 @@ function handleHostReceiveData(data) {
         const allBidsIn = activeIds.length > 0 && activeIds.every(id => gameState.crisis14Bids[id] !== undefined);
         if (allBidsIn) {
           gameState.crisis14AllBidsSubmitted = true;
-          showFacilitatorToast(`🔔 ALL ${activeIds.length} ACTIVE TEAMS SUBMITTED BIDS! Facilitator can reveal bids.`, 'gold');
+          showFacilitatorToast(`🔔 ALL ACTIVE TEAMS WITH STUDENTS SUBMITTED BIDS! Facilitator can reveal bids.`, 'gold');
         }
       }
 
@@ -1388,32 +1409,6 @@ function handleHostReceiveData(data) {
       broadcastGameState();
       break;
   }
-}
-
-function startSoloTest() {
-  isHost = true;
-  isSolo = true;
-  gameState.roomCode = "SOLO";
-  gameState.crisisDeckOrder = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
-  gameState.crisisOrderIndex = 0;
-  gameState.roundNumber = 1;
-
-  initMainDeck();
-  document.getElementById('view-lobby').style.display = 'none';
-  document.getElementById('view-game').style.display = 'block';
-  document.getElementById('host-controls-panel').style.display = 'block';
-  document.getElementById('dev-team-switcher').style.display = 'flex';
-  document.getElementById('room-code-tag').innerText = `ROOM: SOLO-TEST`;
-  document.getElementById('my-identity-tag').innerText = `SANDBOX`;
-  renderUI();
-}
-
-function switchSimulatedTeam(teamId) {
-  myTeamId = teamId;
-  gameState.activeTurnTeamId = teamId;
-  selectedHandIndices = [];
-  selectedTargetHandIndices = [];
-  renderUI();
 }
 
 /* =========================================================================
@@ -1433,7 +1428,7 @@ function hostSetTurn(teamId) {
     showFacilitatorToast(`🚫 Team ${teamId}'s action turn was forfeited due to previous crisis penalty.`, 'alert');
   }
 
-  showFacilitatorToast(`👉 Switched Boardroom Focus to Team ${teamId} (${gameState.teams[teamId].name})`);
+  showFacilitatorToast(`👉 Switched Focus to Team ${teamId} (${gameState.teams[teamId].name})`);
   broadcastGameState();
 }
 
@@ -1446,10 +1441,9 @@ function hostCycleNextTurn() {
 }
 
 function hostTriggerNextCrisis() {
-  // Check if all 15 crises of the current round have concluded
   if (gameState.crisisOrderIndex >= gameState.crisisDeckOrder.length) {
     gameState.roundNumber = (gameState.roundNumber || 1) + 1;
-    // Indefinite rounds: Start with Crisis 1, followed by Crisis 2 to 15 in randomised order!
+    // Round 2+ indefinitely: Always start with Crisis 1, followed by 2-15 randomized!
     const randomizedCrises2to15 = shuffleArray([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]);
     gameState.crisisDeckOrder = [1, ...randomizedCrises2to15];
     gameState.crisisOrderIndex = 0;
@@ -1500,7 +1494,7 @@ function hostConcludeCrisisAndStartAction() {
   if (gameState.crisis8PendingNextAction) {
     gameState.crisis8RuleResetActive = true;
     gameState.crisis8PendingNextAction = false;
-    showFacilitatorToast(`⚡ RULE RESET ACTIVE FOR THIS ACTION PHASE: Draw 3 cards OR fill 2 matching slots with 1 resource!`, 'gold');
+    showFacilitatorToast(`⚡ RULE RESET ACTIVE: Draw 3 cards OR fill 2 matching slots with 1 resource!`, 'gold');
   } else {
     gameState.crisis8RuleResetActive = false;
   }
@@ -1536,6 +1530,7 @@ function hostResetRound() {
   broadcastGameState();
 }
 
+// RESTRICTED GRANT MODAL: Only lists teams with members present
 function hostOpenFacPoolModal() {
   document.getElementById('modal-fac-pool').style.display = 'flex';
   document.getElementById('cnt-f-b').innerText = gameState.facilitatorPool.BUDGET;
@@ -1545,20 +1540,41 @@ function hostOpenFacPoolModal() {
 
   const sel = document.getElementById('fac-grant-team');
   sel.innerHTML = "";
-  getActiveTeamIds().forEach(tid => {
+  const presentIds = getTeamsWithMembers();
+
+  if (presentIds.length === 0) {
     const opt = document.createElement('option');
-    opt.value = tid;
-    opt.innerText = `Team ${tid} (${gameState.teams[tid].name})`;
+    opt.value = "";
+    opt.innerText = "No teams with members present";
     sel.appendChild(opt);
-  });
+  } else {
+    presentIds.forEach(tid => {
+      const opt = document.createElement('option');
+      opt.value = tid;
+      opt.innerText = `Team ${tid} (${gameState.teams[tid].name}) - ${gameState.teams[tid].members.length} Member(s)`;
+      sel.appendChild(opt);
+    });
+  }
 }
 
 function hostExecuteGrant(cardType) {
-  const teamId = parseInt(document.getElementById('fac-grant-team').value);
+  const teamVal = document.getElementById('fac-grant-team').value;
+  if (!teamVal) {
+    alert("⚠️ Cannot grant cards: No teams with members present!");
+    return;
+  }
+
+  const teamId = parseInt(teamVal);
+  const t = gameState.teams[teamId];
+  if (!t || !t.members || t.members.length === 0) {
+    alert("⚠️ Empty teams cannot receive cards! Students must be present in the boardroom.");
+    return;
+  }
+
   if (gameState.facilitatorPool[cardType] > 0) {
     snapshotTeamState(teamId, `Facilitator Granted 1 ${cardType}`);
     gameState.facilitatorPool[cardType]--;
-    gameState.teams[teamId].hand.push(cardType);
+    t.hand.push(cardType);
     hostOpenFacPoolModal();
     showFacilitatorToast(`🎁 Facilitator granted 1 ${cardType} to Team ${teamId}`, 'gold');
     broadcastGameState();
@@ -1613,9 +1629,16 @@ function hostResolveCrisis14Bids() {
   broadcastGameState();
 }
 
+// RESTRICTED EVALUATION: Evaluates only teams with members present
 function hostExecuteCrisis15() {
+  const presentIds = getTeamsWithMembers();
+  if (presentIds.length === 0) {
+    alert("⚠️ No teams with members present to evaluate Digital Transparency Act!");
+    return;
+  }
+
   let counts = [];
-  getActiveTeamIds().forEach(id => {
+  presentIds.forEach(id => {
     const t = gameState.teams[id];
     let compCount = t.hand.filter(c => c === 'COMPLIANCE').length;
     if (t.activeMissionKey) {
@@ -1631,9 +1654,11 @@ function hostExecuteCrisis15() {
   const mostCompTeamId = counts[0].id;
   const leastCompTeamId = counts[counts.length - 1].id;
 
+  // Reward most compliant present team with 2 Budget + 1 Progress
   gameState.teams[mostCompTeamId].hand.push('BUDGET', 'BUDGET');
   addProgressUnitsToTeam(mostCompTeamId, 1);
 
+  // Least compliant loses 1 Innovation
   const innoIdx = gameState.teams[leastCompTeamId].hand.indexOf('INNOVATION');
   if (innoIdx > -1) {
     const rm = gameState.teams[leastCompTeamId].hand.splice(innoIdx, 1)[0];
@@ -1647,8 +1672,14 @@ function hostExecuteCrisis15() {
 }
 
 function hostEvaluateWinner() {
+  const presentIds = getTeamsWithMembers();
+  if (presentIds.length === 0) {
+    alert("No active teams with present students to evaluate winner!");
+    return;
+  }
+
   let teamsArr = [];
-  getActiveTeamIds().forEach(id => {
+  presentIds.forEach(id => {
     const t = gameState.teams[id];
     let curMissionVal = 0;
     if (t.activeMissionKey) curMissionVal = MISSION_SPECS[t.activeMissionKey].value;
@@ -1694,11 +1725,11 @@ function hostEvaluateWinner() {
    ========================================================================= */
 
 function getTargetTeamId() {
-  return (isHost || isSolo) ? gameState.activeTurnTeamId : myTeamId;
+  return isHost ? gameState.activeTurnTeamId : myTeamId;
 }
 
 function clientSendAction(payload) {
-  if (isHost || isSolo) {
+  if (isHost) {
     handleHostReceiveData(payload);
   } else if (mqttClient) {
     const topicAction = `galaxy-gov/${gameState.roomCode || document.getElementById('join-room-code').value.trim().toUpperCase()}/action`;
@@ -1749,16 +1780,16 @@ function clientToggleTargetCard(index) {
 
 function clientClickActiveSlot(slotIndex) {
   const targetId = getTargetTeamId();
-  if (targetId !== gameState.activeTurnTeamId && !isHost && !isSolo) {
+  if (!isHost && targetId !== gameState.activeTurnTeamId) {
     alert("It is not your team's turn yet!");
     return;
   }
   const t = gameState.teams[targetId];
-  if (t.actionTakenThisRound) {
+  if (!isHost && t.actionTakenThisRound) {
     alert("This team has already taken an action this round!");
     return;
   }
-  if (t.skipNextAction && gameState.phase === 'ACTION') {
+  if (!isHost && t.skipNextAction && gameState.phase === 'ACTION') {
     alert("Action turn is skipped this round due to crisis penalty!");
     return;
   }
@@ -1789,7 +1820,7 @@ function clientClickActiveSlot(slotIndex) {
 
 function clientDrawResources() {
   const targetId = getTargetTeamId();
-  if (targetId !== gameState.activeTurnTeamId && !isHost && !isSolo) {
+  if (!isHost && targetId !== gameState.activeTurnTeamId) {
     alert("It is not your team's turn yet!");
     return;
   }
@@ -1806,7 +1837,7 @@ function clientResolveCrisisAction(actionType, extraData = {}) {
   if (!crisis) return;
 
   const isSimultaneous = (actionType === 'crisis7_race' || actionType === 'crisis14_bid');
-  if (!isSimultaneous && targetId !== gameState.activeTurnTeamId && !isHost && !isSolo) {
+  if (!isSimultaneous && !isHost && targetId !== gameState.activeTurnTeamId) {
     alert("It is not your team's turn to resolve the crisis yet!");
     return;
   }
@@ -1966,6 +1997,7 @@ function clientResolveCrisisAction(actionType, extraData = {}) {
       break;
     }
 
+    // Crisis 12 draws only for teams with members present
     case 'crisis12_discard_compliance': {
       if (countCard('COMPLIANCE') < 3) return;
       clientSendAction({
@@ -1977,12 +2009,13 @@ function clientResolveCrisisAction(actionType, extraData = {}) {
     }
 
     case 'crisis12_draw_others': {
-      getActiveTeamIds().forEach(i => {
+      const presentTeams = getTeamsWithMembers();
+      presentTeams.forEach(i => {
         if (i !== targetId) drawCardsForTeam(i, 2);
       });
       clientSendAction({
         type: 'CRISIS_FULFILLED', teamId: targetId,
-        detail: 'Allowed all other active teams to draw 2 resource cards'
+        detail: 'Allowed other active teams with members present to draw 2 resource cards'
       });
       break;
     }
@@ -2090,15 +2123,27 @@ function renderUI() {
     }
   }
 
+  const presentTeams = getTeamsWithMembers();
   for (let id = 1; id <= 4; id++) {
+    const isPresent = presentTeams.includes(id);
     const btn = document.getElementById(`btn-turn-t${id}`);
-    if (btn) btn.className = (id === gameState.activeTurnTeamId) ? 'btn-cyan' : '';
+    if (btn) {
+      btn.className = (id === gameState.activeTurnTeamId) ? 'btn-cyan' : '';
+      btn.style.opacity = isPresent ? '1' : '0.45';
+      btn.title = isPresent ? `Team ${id} has active members` : `Team ${id} is empty`;
+    }
+    const topBtn = document.getElementById(`btn-top-t${id}`);
+    if (topBtn) {
+      topBtn.className = (id === gameState.activeTurnTeamId) ? 'btn-cyan' : '';
+      topBtn.style.opacity = isPresent ? '1' : '0.45';
+    }
   }
 
   const undoList = document.getElementById('undo-buttons-list');
   if (undoList) {
     undoList.innerHTML = "";
-    getActiveTeamIds().forEach(id => {
+    const undoTargets = presentTeams.length > 0 ? presentTeams : [1];
+    undoTargets.forEach(id => {
       const row = document.createElement('div');
       row.className = "undo-bar";
       row.innerHTML = `
@@ -2133,12 +2178,11 @@ function renderUI() {
     crisisBox.style.display = 'none';
   }
 
-  // Next Crisis indicator for the Facilitator button
   let nextCrisisId = 1;
   if (gameState.crisisDeckOrder && gameState.crisisOrderIndex < gameState.crisisDeckOrder.length) {
     nextCrisisId = gameState.crisisDeckOrder[gameState.crisisOrderIndex];
   } else {
-    nextCrisisId = 1; // When a round ends, the next round always starts with Crisis 1
+    nextCrisisId = 1;
   }
   const hostNextNum = document.getElementById('host-next-crisis-num');
   if (hostNextNum) hostNextNum.innerText = nextCrisisId;
@@ -2210,7 +2254,7 @@ function renderCrisisInteractiveButtons() {
   }
 
   const isTargetTurn = (targetId === gameState.activeTurnTeamId);
-  if (!isTargetTurn && !isHost && !isSolo && !isSimultaneous) {
+  if (!isTargetTurn && !isHost && !isSimultaneous) {
     note.style.display = 'none';
     waitNote.style.display = 'block';
     btnContainer.style.display = 'none';
@@ -2297,7 +2341,7 @@ function renderCrisisInteractiveButtons() {
     } else {
       btnContainer.innerHTML = `
         <button class="btn-gold" ${!hasRace ? 'disabled' : ''} onclick="clientResolveCrisisAction('crisis7_race')">
-          ⚡ CLAIM PATENT RACE: Discard 3 Innovation + 1 Budget (+2 Progress, Draw 2) ${!hasRace ? '(Need 3 Inno, 1 Budget)' : ''}
+          ⚡ CLAIM PATENT RACE: Discard 3 Innovation + 1 Budget (+2 Progress, Draw 2)
         </button>
       `;
     }
@@ -2326,14 +2370,6 @@ function renderCrisisInteractiveButtons() {
   }
   else if (crisisId === 10) {
     const nextId = getNextActiveTeamId(targetId);
-    if (!nextId) {
-      btnContainer.innerHTML = `
-        <span style="color:#34d399;">No other active team with players found. Crisis bypassed.</span>
-        <button class="btn-cyan" onclick="clientResolveCrisisAction('cannot_fulfill')">Proceed</button>
-      `;
-      return;
-    }
-
     const nextTeam = gameState.teams[nextId];
     const mySelected = selectedHandIndices.map(i => t.hand[i]);
     const theirSelected = selectedTargetHandIndices.map(i => nextTeam.hand[i]);
@@ -2388,7 +2424,10 @@ function renderCrisisInteractiveButtons() {
   else if (crisisId === 12) {
     let maxProg = -1;
     let leaders = [];
-    getActiveTeamIds().forEach(id => {
+    const presentTeams = getTeamsWithMembers();
+    const evalTeams = presentTeams.length > 0 ? presentTeams : [1];
+
+    evalTeams.forEach(id => {
       const tm = gameState.teams[id];
       const prog = (tm.completedMissions.length * 10) + tm.activeMissionFilledSlots.length;
       if (prog > maxProg) { maxProg = prog; leaders = [id]; }
@@ -2483,7 +2522,7 @@ function renderBoardroomView() {
 
   const isMyTurn = (targetId === gameState.activeTurnTeamId);
   const waitBanner = document.getElementById('turn-wait-banner');
-  if (!isMyTurn && !isHost && !isSolo) {
+  if (!isMyTurn && !isHost) {
     waitBanner.style.display = 'block';
     document.getElementById('turn-wait-team-name').innerText = `Team ${gameState.activeTurnTeamId} (${gameState.teams[gameState.activeTurnTeamId].name})`;
   } else {
@@ -2601,23 +2640,35 @@ function updateActionButtons() {
   const t = gameState.teams[targetId];
   const btnDraw = document.getElementById('btn-draw-resources');
 
-  const isTurn = (targetId === gameState.activeTurnTeamId) || isHost || isSolo;
+  const isTurn = (targetId === gameState.activeTurnTeamId) || isHost;
   const isActionPhase = (gameState.phase === 'ACTION');
 
   btnDraw.innerText = gameState.crisis8RuleResetActive ? "Draw 3 Resource Cards (Rule Reset)" : "Draw 2 Resource Cards";
 
-  const isDrawBlocked = !isActionPhase || !isTurn || t.actionTakenThisRound || t.skipNextAction;
+  const isDrawBlocked = !isActionPhase || !isTurn || (!isHost && t.actionTakenThisRound) || (!isHost && t.skipNextAction);
   btnDraw.disabled = isDrawBlocked || (gameState.drawDeck.length === 0 && gameState.discardDeck.length === 0);
 }
 
+// Renders boardroom overview: Highlights teams with present students
 function renderAllTeamsGrid() {
   const grid = document.getElementById('all-teams-grid');
   grid.innerHTML = "";
 
-  const activeIds = getActiveTeamIds();
-  document.getElementById('active-teams-count-badge').innerText = `${activeIds.length} Team(s) Active`;
+  const presentIds = getTeamsWithMembers();
+  document.getElementById('active-teams-count-badge').innerText = `${presentIds.length} Team(s) Present`;
 
-  activeIds.forEach(id => {
+  // Display all present teams, or provide join guidance if no members have entered yet
+  if (presentIds.length === 0) {
+    grid.innerHTML = `
+      <div style="grid-column: 1/-1; padding: 25px; background: rgba(15,23,42,0.8); border: 1px dashed var(--accent-cyan); border-radius: 12px; text-align: center; color: #94a3b8;">
+        <h4 style="color:var(--accent-gold); margin-bottom: 6px;">BOARDROOM AWAITING TEAMS</h4>
+        <div>Share room code <strong>${gameState.roomCode}</strong> or display the QR code for students to enter from their smartphones or laptops.</div>
+      </div>
+    `;
+    return;
+  }
+
+  presentIds.forEach(id => {
     const t = gameState.teams[id];
     const card = document.createElement('div');
     const isTurn = (id === gameState.activeTurnTeamId);
@@ -2655,7 +2706,7 @@ function renderAllTeamsGrid() {
 
     const membersDisplay = (t.members && t.members.length > 0) 
       ? t.members.join(', ') 
-      : '<span style="color:#64748b; font-style:italic;">Solo / Simulated</span>';
+      : '<span style="color:#ef4444; font-style:italic;">No students joined</span>';
 
     card.innerHTML = `
       <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -2663,7 +2714,7 @@ function renderAllTeamsGrid() {
         <span class="badge badge-budget">${t.points} PTS</span>
       </div>
       <div style="font-size:0.8rem; color:#38bdf8; margin-top:4px;">
-        <strong>Members:</strong> ${membersDisplay}
+        <strong>Present (${t.members.length}):</strong> ${membersDisplay}
       </div>
       <div style="font-size:0.8rem; margin-top:4px;">
         Hand: <strong>${t.hand.length}</strong> cards | Completed: <strong>${t.completedMissions.length}/3</strong>
